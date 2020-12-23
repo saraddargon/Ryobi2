@@ -88,7 +88,7 @@ namespace StockControl
                 RadCheckBox lb = (RadCheckBox)obj;
                 lb.Text = Stext;
             }
-
+            //TEST/
         }
         // ฟังก์ชั่น Update DatagridView
         public static void DGVCOMMIT(object sender, EventArgs e) //Commit
