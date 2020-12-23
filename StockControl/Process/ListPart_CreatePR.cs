@@ -77,7 +77,7 @@ namespace StockControl
                         
                     //).ToList();
 
-                    var g = (from ix in db.sp_014_Select_PartList(txtCodeNo.Text, txtPartName.Text, txtDescription.Text, txtVenderNo.Text,"","Active") select ix).ToList();
+                    var g = (from ix in db.sp_014_Select_PartList(txtCodeNo.Text, txtPartName.Text, txtDescription.Text, txtVenderNo.Text,"","Active",dbClss.DeptSC,"") select ix).ToList();
                    
                         if (g.Count > 0)
                     {

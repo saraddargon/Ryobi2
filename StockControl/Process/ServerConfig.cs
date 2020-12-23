@@ -23,7 +23,7 @@ namespace StockControl
 
         private void ServerConfig_Load(object sender, EventArgs e)
         {
-            string apc = Properties.Settings.Default.dbStockControlConnectionString3;
+            string apc = Properties.Settings.Default.dbSparePart10ConnectionString;
             try
             {
                 if (!apc.Equals(""))

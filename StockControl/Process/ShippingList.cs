@@ -15,7 +15,16 @@ namespace StockControl
     {
         public ShippingList()
         {
+            this.Name = "ShippingList";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+
         }
         public ShippingList(Telerik.WinControls.UI.RadTextBox SHNoxxx
                     , Telerik.WinControls.UI.RadTextBox CodeNoxxx)
@@ -24,8 +33,58 @@ namespace StockControl
             SHNo_tt = SHNoxxx;
             CodeNo_tt = CodeNoxxx;
             screen = 1;
+            CallLang();
 
         }
+
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+              
+                this.Text = "Shipping List";
+                radLabelElement1.Text = "Shipping List";
+                btnSave.Text = "Open Doc.";
+                radButtonElement2.Text = "Edit (Line,Mold,Machine)";
+                btnPrint.Text = "Print";
+                btnExport.Text = "Export";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                btnRefresh.Text = "Refresh";
+                radButton1.Text = "Search..";
+
+                radLabel1.Text = "Shiping No.:";
+                radLabel2.Text = "Status:";
+                radLabel3.Text = "Select";
+                radLabel4.Text = "To";
+                radLabel5.Text = "Select for Fast Search..";
+                radLabel6.Text = "Code No.:";
+                radLabel7.Text = "Description:";
+
+                dgvData.Columns[0].HeaderText = "No";
+                dgvData.Columns[1].HeaderText = "Status";
+                dgvData.Columns[2].HeaderText = "Shiping No.";
+                dgvData.Columns[3].HeaderText = "Dept.Code";
+                dgvData.Columns[4].HeaderText = "Code No.";
+                dgvData.Columns[5].HeaderText = "ToolName";
+                dgvData.Columns[6].HeaderText = "Descriptoin";
+                dgvData.Columns[7].HeaderText = "Quantity";
+                dgvData.Columns[8].HeaderText = "Unit";
+                dgvData.Columns[9].HeaderText = "Pcs/Unit";
+                dgvData.Columns[10].HeaderText = "LotNo";
+                dgvData.Columns[11].HeaderText = "Machine";
+                dgvData.Columns[12].HeaderText = "Line No.";
+                dgvData.Columns[13].HeaderText = "MOLD";
+                dgvData.Columns[14].HeaderText = "Req.By";
+                dgvData.Columns[15].HeaderText = "CreateBy";
+                dgvData.Columns[16].HeaderText = "CreateDate";
+                dgvData.Columns[17].HeaderText = "Purpose";
+      
+
+
+            }
+        }
+
         Telerik.WinControls.UI.RadTextBox SHNo_tt = new Telerik.WinControls.UI.RadTextBox();
         Telerik.WinControls.UI.RadTextBox CodeNo_tt = new Telerik.WinControls.UI.RadTextBox();
         int screen = 0;
@@ -69,10 +128,20 @@ namespace StockControl
             dgvData.AutoGenerateColumns = false;
             //GETDTRow();
             // DefaultItem();
-            dtDate1.Value = DateTime.Now;
-            dtDate2.Value = DateTime.Now;
+            var today = DateTime.Now;
+            var month = new DateTime(today.Year, today.Month, 1);
+            var first = month;
+            var last = month.AddMonths(1).AddDays(-1);
 
-            DataLoad();
+            dtDate1.Value = first;
+            dtDate2.Value = last;
+            if (dbClss.Company.Equals("RYOBI"))
+            {
+                dgvData.Columns["LotNo"].IsVisible = false;
+                dgvData.Columns["PCSUnit"].IsVisible = false;
+            }
+
+               // DataLoad();
 
          
         }
@@ -118,9 +187,9 @@ namespace StockControl
             
             try
             {
-                DateTime inclusiveStart = dtDate1.Value.Date;
+              //  DateTime inclusiveStart = dtDate1.Value.Date;
                 // Include the *whole* of the day indicated by searchEndDate
-                DateTime exclusiveEnd = dtDate2.Value.Date.AddDays(1);
+               // DateTime exclusiveEnd = dtDate2.Value.Date.AddDays(1);
 
                 this.Cursor = Cursors.WaitCursor;
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
@@ -130,45 +199,50 @@ namespace StockControl
                     //{
                     //    Status = "";
                     //}
-                    var r = (from d in db.tb_Shippings
-                             join h in db.tb_ShippingHs on d.ShippingNo equals h.ShippingNo
-                             join i in db.tb_Items on d.CodeNo equals i.CodeNo
+                    //var r = (from d in db.tb_Shippings
+                    //         join h in db.tb_ShippingHs on d.ShippingNo equals h.ShippingNo
+                    //         join i in db.tb_Items on d.CodeNo equals i.CodeNo
 
-                             where h.Status != "Cancel" //&& d.verticalID == VerticalID
-                                   &&  d.Status != "Cancel"
-                                 &&  d.ShippingNo.Contains(txtSHNo.Text.Trim())
-                                 && (h.ShipDate >= inclusiveStart
-                                        && h.ShipDate < exclusiveEnd)
-                             //&& ((Convert.ToDateTime(h.ShipDate.Value)) >= (Convert.ToDateTime(dtDate1.Value)))
-                             //&& ((Convert.ToDateTime(h.ShipDate.Value)) <= (Convert.ToDateTime(dtDate2.Value)))
+                    //         where h.Status != "Cancel" //&& d.verticalID == VerticalID
+                    //               &&  d.Status != "Cancel"
+                    //             &&  d.ShippingNo.Contains(txtSHNo.Text.Trim())
+                    //             && (h.ShipDate >= inclusiveStart
+                    //                    && h.ShipDate < exclusiveEnd)
+                    //         //&& ((Convert.ToDateTime(h.ShipDate.Value)) >= (Convert.ToDateTime(dtDate1.Value)))
+                    //         //&& ((Convert.ToDateTime(h.ShipDate.Value)) <= (Convert.ToDateTime(dtDate2.Value)))
 
-                             select new
-                             {
-                                 ShippingNo = d.ShippingNo,
-                                 CodeNo = d.CodeNo,
-                                 ItemNo = d.ItemNo,
-                                 ItemDescription = d.ItemDescription,
-                                 QTY = d.QTY,
-                                 UnitShip = d.UnitShip,
-                                 PCSUnit = d.PCSUnit,
-                                 LeadTime = i.Leadtime,
-                                 MaxStock = i.MaximumStock,
-                                 MinStock = i.MinimumStock,
-                                 ShipName = h.ShipName,
-                                 CreateDate = h.CreateDate,
+                    //         select new
+                    //         {
+                    //             ShippingNo = d.ShippingNo,
+                    //             CodeNo = d.CodeNo,
+                    //             ItemNo = d.ItemNo,
+                    //             ItemDescription = d.ItemDescription,
+                    //             QTY = d.QTY,
+                    //             UnitShip = d.UnitShip,
+                    //             PCSUnit = d.PCSUnit,
+                    //             LeadTime = i.Leadtime,
+                    //             MaxStock = i.MaximumStock,
+                    //             MinStock = i.MinimumStock,
+                    //             ShipName = h.ShipName,
+                    //             CreateDate = h.CreateDate,
 
-                                 CreateBy = h.CreateBy,
-                                 Remark = d.Remark,
-                                 Status = d.Status,
-                                 id = d.id,
-                                 LineName = d.LineName,
-                                 MachineName = d.MachineName,
-                                 LotNo = d.LotNo,
-                                 SerialNo = d.SerialNo
+                    //             CreateBy = h.CreateBy,
+                    //             Remark = d.Remark,
+                    //             Status = d.Status,
+                    //             id = d.id,
+                    //             LineName = d.LineName,
+                    //             MachineName = d.MachineName,
+                    //             LotNo = d.LotNo,
+                    //             SerialNo = d.SerialNo
 
 
-                             }).ToList();
-                    dgvData.DataSource = r;
+                    //         }).ToList();
+                      dgvData.DataSource = null;
+                       dgvData.DataSource = db.spx_007_selectShipping(dbClss.DeptSC, chkDate.Checked, dtDate1.Value, dtDate2.Value, txtCodeNo.Text, txtItemDescription.Text, txtSHNo.Text, cboStatus.Text).ToList();
+
+                   //  var rList= db.spx_007_selectShipping(dbClss.DeptSC, chkDate.Checked, dtDate1.Value, dtDate2.Value, txtCodeNo.Text, txtItemDescription.Text, txtSHNo.Text, cboStatus.Text).ToList();
+                  //  var rList = db.spx_007_selectShipping2x(dbClss.DeptSC).ToList();
+                   // MessageBox.Show(rList.Count.ToString());
 
                     int rowcount = 0;
                     foreach (var x in dgvData.Rows)
@@ -650,6 +724,28 @@ namespace StockControl
 
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void radButtonElement1_Click(object sender, EventArgs e)
+        {
+            ShippingListByCost Shi = new ShippingListByCost();
+            Shi.Show();
+        }
+
+        private void radButtonElement2_Click(object sender, EventArgs e)
+        {
+            if(row>=0)
+            {
+                int id2 = 0;
+                int.TryParse(Convert.ToString(dgvData.Rows[row].Cells["id"].Value), out id2);
+                if(id2>0)
+                {
+                    ShippingEditMC sh = new ShippingEditMC(id2);
+                    sh.ShowDialog();
+                    DataLoad();
+                }
+
+            }
         }
     }
 }

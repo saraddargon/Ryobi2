@@ -8,15 +8,27 @@ using System.Windows.Forms;
 using System.Linq;
 using Microsoft.VisualBasic.FileIO;
 using Telerik.WinControls.UI;
-
+using System.IO;
+using Excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
+using Microsoft.VisualBasic;
 namespace StockControl
 {
     public partial class ListPart : Telerik.WinControls.UI.RadRibbonForm
     {
         public ListPart(string CodeNox)
         {
+            this.Name = "ListPart";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            
             CodeNo = CodeNox;
+            CallLang();
             //this.Text = "ประวัติ "+ Screen;
         }
         Telerik.WinControls.UI.RadTextBox CodeNo_tt = new Telerik.WinControls.UI.RadTextBox();
@@ -26,12 +38,81 @@ namespace StockControl
             InitializeComponent();
             CodeNo_tt = CodeNox;
             screen = 1;
+            CallLang();
         }
         public ListPart()
         {
+            this.Name = "ListPart";
+
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            // InitializeComponent();
+            CallLang();
         }
 
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                //gridViewTextBoxColumn1.HeaderText = "ลำดับ";
+                //gridViewCheckBoxColumn1.HeaderText = "เลือก";
+                this.Text = "Tools List";
+                dbClss.ChangeTextEng(radButtonElement1, 2, this.Name, "New Item");
+                dbClss.ChangeTextEng(btnExport, 2, this.Name, "Export");
+                dbClss.ChangeTextEng(btnRefresh, 2, this.Name, "Refresh");
+                dbClss.ChangeTextEng(btnFilter1, 2, this.Name, "Filter");
+                dbClss.ChangeTextEng(btnUnfilter1, 2, this.Name, "UnFilter");
+                btnSearch.Text = "Search..";
+                radLabel37.Text = "Code No.:";
+                radLabel2.Text = "Description.:";
+                radLabel1.Text = "Tool Name:";
+                radLabel3.Text = "Vendor :";
+                radLabelElement1.Text = "Item List All";
+
+                radGridView1.Columns[0].HeaderText = "No.";                
+                radGridView1.Columns[1].HeaderText = "Select";
+                radGridView1.Columns[2].HeaderText = "Dept.";
+                radGridView1.Columns[3].HeaderText = "Dept. Code";
+                radGridView1.Columns[4].HeaderText = "CodeNo.";
+                radGridView1.Columns[5].HeaderText = "Tool Name";
+                radGridView1.Columns[6].HeaderText = "Description.";
+                radGridView1.Columns[7].HeaderText = "Stock(Remain)";
+
+                radGridView1.Columns[8].HeaderText = "Order Qty";
+                radGridView1.Columns[9].HeaderText = "Size";
+                radGridView1.Columns[10].HeaderText = "Shelf";
+                radGridView1.Columns[11].HeaderText = "Stop Order";
+                radGridView1.Columns[12].HeaderText = "Group Type";
+                radGridView1.Columns[13].HeaderText = "Type";
+                radGridView1.Columns[14].HeaderText = "Cost";
+                radGridView1.Columns[15].HeaderText = "Unit(pur)";
+                radGridView1.Columns[16].HeaderText = "Pcs/Unit";
+                radGridView1.Columns[17].HeaderText = "Unit(Ship)";
+
+                radGridView1.Columns[18].HeaderText = "VendorNo";
+                radGridView1.Columns[19].HeaderText = "VendorName";
+                radGridView1.Columns[20].HeaderText = "Maker";
+                radGridView1.Columns[21].HeaderText = "Leadtime";
+                radGridView1.Columns[22].HeaderText = "Package Std.";
+                radGridView1.Columns[23].HeaderText = "Max Stock";
+                radGridView1.Columns[24].HeaderText = "Min Stock";
+                radGridView1.Columns[25].HeaderText = "Tool Life.";
+
+                radGridView1.Columns[26].HeaderText = "Avg Std.";
+                radGridView1.Columns[27].HeaderText = "Status";
+                radGridView1.Columns[28].HeaderText = "Remark";
+               
+
+
+
+
+            }
+        }
         string CodeNo = "";
         //private int RowView = 50;
         //private int ColView = 10;
@@ -78,24 +159,33 @@ namespace StockControl
                     //    && a.VendorItemName.Contains(txtVendorName.Text))
                     //    .ToList();
 
-
-                    var g = (from ix in db.sp_014_Select_PartList(txtCodeNo.Text,txtPartName.Text,txtDescription.Text,"",txtVendorName.Text,"") select ix).ToList();
-                    if (g.Count > 0)
+                    if (ckList1000.Checked)
                     {
-                        radGridView1.DataSource = g;
-                        foreach (var x in radGridView1.Rows)
+                        var g = (from ix in db.sp_014_Select_PartList2(txtCodeNo.Text, txtPartName.Text, txtDescription.Text, "", txtVendorName.Text, "", dbClss.DeptSC, cboFilter.Text) select ix).ToList();
+                        if (g.Count > 0)
                         {
-                            c += 1;
-                            x.Cells["No"].Value = c;
-                            //       // x.Cells["StockInv"].Value = (Convert.ToDecimal(db.Cal_QTY(Convert.ToString(x.Cells["CodeNo"].Value), "Invoice", 0)));
-                            //       // x.Cells["StockDL"].Value = (Convert.ToDecimal(db.Cal_QTY(Convert.ToString(x.Cells["CodeNo"].Value), "Temp", 0)));
-                            //       // x.Cells["StockBackOrder"].Value = (Convert.ToDecimal(db.Cal_QTY(Convert.ToString(x.Cells["CodeNo"].Value), "BackOrder", 0)));
-
-                            //    }
+                            radGridView1.DataSource = g;
+                            foreach (var x in radGridView1.Rows)
+                            {
+                                c += 1;
+                                x.Cells["No"].Value = c;
+                            }
                         }
                     }
-
-
+                    else
+                    {
+                        var g = (from ix in db.sp_014_Select_PartList(txtCodeNo.Text, txtPartName.Text, txtDescription.Text, "", txtVendorName.Text, "", dbClss.DeptSC, cboFilter.Text) select ix).ToList();
+                        if (g.Count > 0)
+                        {
+                            radGridView1.DataSource = g;
+                            foreach (var x in radGridView1.Rows)
+                            {
+                                c += 1;
+                                x.Cells["No"].Value = c;
+                            }
+                        }
+                    }
+                                        
                 }
             }
             catch(Exception ex) { MessageBox.Show(ex.Message); }
@@ -300,7 +390,7 @@ namespace StockControl
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
                     //delete ทิ้งก่อน
-                    var deleteItem = (from ii in db.TempPrintShelfs where ii.UserName == Environment.UserName select ii);
+                    var deleteItem = (from ii in db.TempPrintShelfs where ii.UserName == dbClss.UserID select ii);
                     foreach (var d in deleteItem)
                     {
                         db.TempPrintShelfs.DeleteOnSubmit(d);
@@ -322,7 +412,7 @@ namespace StockControl
                                 
                                 c += 1;
                                 TempPrintShelf ps = new TempPrintShelf();
-                                ps.UserName = Environment.UserName;
+                                ps.UserName = dbClss.UserID;
                                 ps.CodeNo = g.FirstOrDefault().CodeNo;
                                 ps.PartDescription = g.FirstOrDefault().ItemDescription;
                                 ps.PartNo = g.FirstOrDefault().ItemNo;
@@ -339,7 +429,7 @@ namespace StockControl
                     if (c > 0)
                     {
                         Report.Reportx1.Value = new string[2];
-                        Report.Reportx1.Value[0] = Environment.UserName;
+                        Report.Reportx1.Value[0] = dbClss.UserID;
                         Report.Reportx1.WReport = "002_BoxShelf_Part";
                         Report.Reportx1 op = new Report.Reportx1("002_BoxShelf_Part.rpt");
                         op.Show();
@@ -360,9 +450,10 @@ namespace StockControl
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
 
+                    db.spx_012_DeleteBarcode();
                    
                         // Step 1 delete UserName
-                        var deleteItem = (from ii in db.TempPrintKanbans where ii.UserName == Environment.UserName select ii);
+                        var deleteItem = (from ii in db.TempPrintKanbans where ii.UserName == dbClss.UserID select ii);
                         foreach (var d in deleteItem)
                         {
                             db.TempPrintKanbans.DeleteOnSubmit(d);
@@ -385,7 +476,7 @@ namespace StockControl
                                 {
                                     c += 1;
                                     TempPrintKanban tm = new TempPrintKanban();
-                                    tm.UserName = Environment.UserName;
+                                    tm.UserName = dbClss.UserID;
                                     tm.CodeNo = g.FirstOrDefault().CodeNo;
                                     tm.PartDescription = g.FirstOrDefault().ItemDescription;
                                     tm.PartNo = g.FirstOrDefault().ItemNo;
@@ -408,7 +499,7 @@ namespace StockControl
                         if (c > 0)
                         {
                             Report.Reportx1.Value = new string[2];
-                            Report.Reportx1.Value[0] = Environment.UserName;
+                            Report.Reportx1.Value[0] = dbClss.UserID;
                             Report.Reportx1.WReport = "001_Kanban_Part";
                             Report.Reportx1 op = new Report.Reportx1("001_Kanban_Part.rpt");
                             op.Show();
@@ -490,6 +581,178 @@ namespace StockControl
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        int rows1 = 0;
+        private void btnReportStockCard_Click(object sender, EventArgs e)
+        {
+            if(rows1 >= 0)
+            {
+                string CodeNos = radGridView1.Rows[rows1].Cells["CodeNo"].Value.ToString();
+                if(!CodeNos.Equals(""))
+                {
+                    PrintStockCard1 ps = new PrintStockCard1(CodeNos);
+                    ps.Show();
+                }
+            }
+        }
+
+        private void radGridView1_CellClick_1(object sender, GridViewCellEventArgs e)
+        {
+            rows1 = e.RowIndex;
+        }
+
+        private void radButtonElement2_Click(object sender, EventArgs e)
+        {
+            if (rows1 >= 0)
+            {
+                string CodeNos = radGridView1.Rows[rows1].Cells["CodeNo"].Value.ToString();
+                if (!CodeNos.Equals(""))
+                {
+                    StockItemCost cs = new StockItemCost(CodeNos);
+                    cs.ShowDialog();
+                }
+            }
+        }
+
+        private void radButtonElement3_Click(object sender, EventArgs e)
+        {
+            StockItemCostVendor sv = new StockItemCostVendor("");
+            sv.ShowDialog();
+        }
+
+        private void radButtonElement4_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("คุณต้องการอัพเดต Shelf No.","อัพเดต",MessageBoxButtons.YesNo,MessageBoxIcon.Question)==DialogResult.Yes)
+            {
+                try
+                {
+                    openFileDialog1.Filter = "Excel files (*.xlsx)|*.xlsx";
+                    openFileDialog1.FilterIndex = 2;
+                    openFileDialog1.RestoreDirectory = true;
+                    openFileDialog1.FileName = "";
+                    if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                    {
+
+                        // txtPath.Text = openFileDialog1.FileName;
+                        UploadExcel(openFileDialog1.FileName);
+                    }
+                }
+                catch(Exception ex) { MessageBox.Show(ex.Message); }
+            }
+        }
+
+        private void UploadExcel(string filePaht)
+        {
+            try
+            {
+                progressBar1.Visible = true;
+                string Shelf = "";
+                string CodeNo = "";
+                Excel.Application excelApp = new Excel.Application();
+                Excel.Workbook excelBook = excelApp.Workbooks.Open(
+                  filePaht, 0, true, 5,
+                  "", "", true, Excel.XlPlatform.xlWindows, "\t", false, false,
+                  0, true);
+                Excel.Sheets sheets = excelBook.Worksheets;
+                Excel.Worksheet worksheet = (Excel.Worksheet)sheets.get_Item(1);
+                int countP = 2000;
+                int EndofTAG = 0;
+                int Rowx = 0;
+                int rows = 0;
+                int countRow = 0;
+                
+
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = 2000;
+                progressBar1.Step = 1;
+                
+
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    for (int ixi = 0; ixi < countP; ixi++)
+                    {
+                        rows += 1;
+                        Rowx += 1;
+                        System.Array myvalues;
+                        Excel.Range range = worksheet.get_Range("A" + Rowx.ToString(), "B" + Rowx.ToString());
+                        myvalues = (System.Array)range.Cells.Value;
+                        string[] strArray = ConvertToStringArray(myvalues);
+
+                        if (!Convert.ToString(strArray[0]).Equals("") &&
+                            !Convert.ToString(strArray[1]).Equals("")
+                            )
+                        {
+                            //Update Shelf//
+                            tb_Item item = db.tb_Items.Where(i => i.CodeNo.Equals(Convert.ToString(strArray[0]))).FirstOrDefault();
+                            if(item!=null)
+                            {
+                                progressBar1.Value = rows;
+                                progressBar1.PerformStep();
+                                item.ShelfNo = Convert.ToString(strArray[1]);
+                                db.SubmitChanges();
+
+                            }
+                        }
+                    }
+                    excelBook.Close(0);
+                    excelApp.Quit();
+
+                    releaseObject(worksheet);
+                    releaseObject(excelBook);
+                    releaseObject(excelApp);
+                    Marshal.FinalReleaseComObject(worksheet);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelBook);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                    GC.GetTotalMemory(false);
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    GC.GetTotalMemory(true);
+                    /////////////////////////////////////
+
+                    MessageBox.Show("Import Completed.\n row=" + rows);
+
+                }
+
+            }
+            catch { }
+            progressBar1.Visible = false;
+        }
+        private string[] ConvertToStringArray(System.Array values)
+        {
+
+            // create a new string array
+            string[] theArray = new string[values.Length];
+
+            // loop through the 2-D System.Array and populate the 1-D String Array
+            for (int i = 1; i <= values.Length; i++)
+            {
+                if (values.GetValue(1, i) == null)
+                    theArray[i - 1] = "";
+                else
+                    theArray[i - 1] = (string)values.GetValue(1, i).ToString();
+            }
+
+            return theArray;
+        }
+        private void releaseObject(object obj)
+        {
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                obj = null;
+                // MessageBox.Show("Exception Occured while releasing object " + ex.ToString());
+            }
+            finally
+            {
+                GC.Collect();
+            }
         }
     }
 }

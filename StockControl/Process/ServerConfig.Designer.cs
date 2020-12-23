@@ -81,11 +81,11 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(115, 20);
+            this.label3.Location = new System.Drawing.Point(149, 22);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(140, 13);
+            this.label3.Size = new System.Drawing.Size(73, 13);
             this.label3.TabIndex = 0;
-            this.label3.Text = "ข้อมูลการเชื่อมต่อ ฐานข้อมูล";
+            this.label3.Text = "Server Config";
             // 
             // label4
             // 

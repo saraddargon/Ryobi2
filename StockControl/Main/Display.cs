@@ -205,7 +205,7 @@ namespace StockControl
                         {
                             ListItem.ImageIndex = 28;
                         }
-                        else if (c.LinkNode.ToString().Equals("AdjustStock"))
+                        else if (c.LinkNode.ToString().Equals("AdjustStock") || c.LinkNode.ToString().Equals("AdjustStock_List") || c.LinkNode.ToString().Equals("CheckStock"))
                         {
                             ListItem.ImageIndex = 29;
                         }

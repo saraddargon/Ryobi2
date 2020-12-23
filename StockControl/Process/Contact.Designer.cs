@@ -119,7 +119,7 @@
             // 
             // 
             this.radRibbonBar1.RootElement.AutoSizeMode = Telerik.WinControls.RadAutoSizeMode.WrapAroundChildren;
-            this.radRibbonBar1.Size = new System.Drawing.Size(730, 161);
+            this.radRibbonBar1.Size = new System.Drawing.Size(730, 160);
             this.radRibbonBar1.StartButtonImage = ((System.Drawing.Image)(resources.GetObject("radRibbonBar1.StartButtonImage")));
             this.radRibbonBar1.StartMenuItems.AddRange(new Telerik.WinControls.RadItem[] {
             this.radMenuItem1,
@@ -141,6 +141,7 @@
             this.radRibbonBarGroup5});
             this.ribbonTab1.Name = "ribbonTab1";
             this.ribbonTab1.Text = "Action";
+            this.ribbonTab1.UseMnemonic = false;
             // 
             // radRibbonBarGroup1
             // 
@@ -335,7 +336,6 @@
             this.radStatusStrip1.Size = new System.Drawing.Size(730, 26);
             this.radStatusStrip1.SizingGrip = false;
             this.radStatusStrip1.TabIndex = 1;
-            this.radStatusStrip1.Text = "radStatusStrip1";
             // 
             // radLabelElement1
             // 
@@ -350,9 +350,9 @@
             this.panel1.Controls.Add(this.radGridView1);
             this.panel1.Controls.Add(this.radPanel1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 161);
+            this.panel1.Location = new System.Drawing.Point(0, 160);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(730, 332);
+            this.panel1.Size = new System.Drawing.Size(730, 333);
             this.panel1.TabIndex = 2;
             // 
             // radGridView1
@@ -445,9 +445,8 @@
             this.radGridView1.Name = "radGridView1";
             this.radGridView1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.radGridView1.ShowGroupPanel = false;
-            this.radGridView1.Size = new System.Drawing.Size(730, 298);
+            this.radGridView1.Size = new System.Drawing.Size(730, 299);
             this.radGridView1.TabIndex = 2;
-            this.radGridView1.Text = "Grid";
             this.radGridView1.ThemeName = "Office2010Blue";
             this.radGridView1.CellFormatting += new Telerik.WinControls.UI.CellFormattingEventHandler(this.radGridView1_CellFormatting);
             this.radGridView1.CellEndEdit += new Telerik.WinControls.UI.GridViewCellEventHandler(this.radGridView1_CellEndEdit);
@@ -471,7 +470,6 @@
             // cboVendor
             // 
             this.cboVendor.AutoFilter = true;
-            this.cboVendor.AutoSize = true;
             this.cboVendor.AutoSizeDropDownColumnMode = Telerik.WinControls.UI.BestFitColumnMode.None;
             this.cboVendor.AutoSizeDropDownHeight = true;
             this.cboVendor.AutoSizeDropDownToBestFit = true;
@@ -529,7 +527,7 @@
             this.cboVendor.EditorControl.ShowGroupPanel = false;
             this.cboVendor.EditorControl.Size = new System.Drawing.Size(240, 150);
             this.cboVendor.EditorControl.TabIndex = 0;
-            this.cboVendor.Location = new System.Drawing.Point(62, 5);
+            this.cboVendor.Location = new System.Drawing.Point(88, 5);
             this.cboVendor.Name = "cboVendor";
             this.cboVendor.Size = new System.Drawing.Size(88, 21);
             this.cboVendor.TabIndex = 2;
@@ -540,31 +538,35 @@
             // 
             // txtVenderName
             // 
-            this.txtVenderName.Location = new System.Drawing.Point(208, 6);
+            this.txtVenderName.Location = new System.Drawing.Point(281, 6);
             this.txtVenderName.Name = "txtVenderName";
             this.txtVenderName.ReadOnly = true;
-            this.txtVenderName.Size = new System.Drawing.Size(383, 20);
+            this.txtVenderName.Size = new System.Drawing.Size(310, 20);
             this.txtVenderName.TabIndex = 1;
             this.txtVenderName.ThemeName = "Office2010Blue";
             this.txtVenderName.TextChanged += new System.EventHandler(this.txtVenderName_TextChanged);
             // 
             // radLabel2
             // 
+            this.radLabel2.AutoSize = false;
             this.radLabel2.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radLabel2.Location = new System.Drawing.Point(156, 8);
+            this.radLabel2.Location = new System.Drawing.Point(186, 8);
             this.radLabel2.Name = "radLabel2";
-            this.radLabel2.Size = new System.Drawing.Size(46, 17);
+            this.radLabel2.Size = new System.Drawing.Size(97, 17);
             this.radLabel2.TabIndex = 0;
             this.radLabel2.Text = "ชื่อผู้ขาย";
+            this.radLabel2.TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // radLabel1
             // 
+            this.radLabel1.AutoSize = false;
             this.radLabel1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radLabel1.Location = new System.Drawing.Point(9, 7);
+            this.radLabel1.Location = new System.Drawing.Point(12, 7);
             this.radLabel1.Name = "radLabel1";
-            this.radLabel1.Size = new System.Drawing.Size(52, 17);
+            this.radLabel1.Size = new System.Drawing.Size(69, 17);
             this.radLabel1.TabIndex = 0;
             this.radLabel1.Text = "รหัสผู้ขาย";
+            this.radLabel1.TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // radRibbonBarButtonGroup2
             // 

@@ -9,6 +9,9 @@ using System.Linq;
 using Microsoft.VisualBasic.FileIO;
 using Telerik.WinControls.Data;
 using System.IO;
+using Excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
+using Microsoft.VisualBasic;
 
 namespace StockControl
 {
@@ -16,7 +19,16 @@ namespace StockControl
     {
         public CreatePart()
         {
+            this.Name = "CreatePart";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+            
           
         }
         string CodeNo = "";
@@ -24,6 +36,71 @@ namespace StockControl
         {
             InitializeComponent();
             this.CodeNo = CodeNo;
+            CallLang();
+        }
+        private void CallLang()
+        {          
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Create Tools";
+                dbClss.ChangeTextEng(btnNew, 2, this.Name, "New+");
+                dbClss.ChangeTextEng(btnSave, 2, this.Name, "SaveData");
+                dbClss.ChangeTextEng(btnView, 2, this.Name, "Display List");
+                dbClss.ChangeTextEng(btnDelete, 2, this.Name, "Delete");
+                dbClss.ChangeTextEng(btnEdit, 2, this.Name, "Edit Data");
+                dbClss.ChangeTextEng(radButtonElement2, 2, this.Name, "Fix Item No.");
+                dbClss.ChangeTextEng(btnImport, 2, this.Name, "Import");
+                dbClss.ChangeTextEng(btnExport, 2, this.Name, "Export");
+                dbClss.ChangeTextEng(btnRefresh, 2, this.Name, "Refresh");
+                dbClss.ChangeTextEng(radButtonElement1, 2, this.Name, "List Item");
+
+                //step 2
+                dbClss.ChangeTextEng(radLabel7, 3, this.Name, "Dept.:");
+                dbClss.ChangeTextEng(radLabel37, 3, this.Name, "Code No.:");
+                dbClss.ChangeTextEng(radLabel3, 3, this.Name, "Item Name.:");
+                dbClss.ChangeTextEng(radLabel4, 3, this.Name, "Description:");
+                dbClss.ChangeTextEng(radLabel5, 3, this.Name, "Group Type:");
+                dbClss.ChangeTextEng(radLabel6, 3, this.Name, "Type:");
+                dbClss.ChangeTextEng(radLabel1, 3, this.Name, "Vendor No.:");
+                dbClss.ChangeTextEng(radLabel2, 3, this.Name, "Vendor Name:");
+                dbClss.ChangeTextEng(radLabel43, 3, this.Name, "Maker:");
+                dbClss.ChangeTextEng(radLabel25, 3, this.Name, "Cost/Unit:");
+                dbClss.ChangeTextEng(radLabel23, 3, this.Name, "Unit(Pur):");
+                dbClss.ChangeTextEng(radLabel24, 3, this.Name, "Unit(Stock):");
+                dbClss.ChangeTextEng(radLabel12, 3, this.Name, "PCS/Unit:");
+                dbClss.ChangeTextEng(radLabel33, 3, this.Name, "LeadTime:");
+                dbClss.ChangeTextEng(radLabel53, 3, this.Name, "Control Lot.:");
+
+                dbClss.ChangeTextEng(radLabel26, 3, this.Name, "Replacement:");
+                dbClss.ChangeTextEng(radLabel35, 3, this.Name, "Tool Life :");
+                dbClss.ChangeTextEng(radLabel45, 3, this.Name, "Size :");
+                dbClss.ChangeTextEng(radLabel47, 3, this.Name, "Remark :");
+
+                dbClss.ChangeTextEng(radLabel8, 3, this.Name, "Cre.By:");
+                dbClss.ChangeTextEng(radLabel9, 3, this.Name, "Cre.Date:");
+                dbClss.ChangeTextEng(radLabel10, 3, this.Name, "Upd.By:");
+                dbClss.ChangeTextEng(radLabel11, 3, this.Name, "Upd.Date:");
+
+
+                //Step 3
+                dbClss.ChangeTextEng(chkStopOrder, 5, this.Name, "Stop Order");
+
+                dbClss.ChangeTextEng(radGroupBox1, 4, this.Name, "Status");
+                dbClss.ChangeTextEng(radGroupBox2, 4, this.Name, "Warehouse");
+                dbClss.ChangeTextEng(radGroupBox3, 4, this.Name, "Other Data");
+
+                //Step 4
+                radLabel17.Visible = false;
+                radLabel18.Visible = false;
+                radLabel19.Visible = false;
+                radLabel20.Visible = false;
+
+                radLabel50.Visible = false;
+                radLabel56.Visible = false;
+
+
+
+            }
         }
 
         private int Cath01 = 9;
@@ -49,6 +126,7 @@ namespace StockControl
 
             dt_Part = new DataTable();
 
+            dt_Part.Columns.Add(new DataColumn("DeptCode", typeof(string)));
             dt_Part.Columns.Add(new DataColumn("CodeNo", typeof(string)));
             dt_Part.Columns.Add(new DataColumn("ItemNo", typeof(string)));
             dt_Part.Columns.Add(new DataColumn("ItemDescription", typeof(string)));
@@ -85,6 +163,7 @@ namespace StockControl
             dt_Part.Columns.Add(new DataColumn("CreateDate", typeof(DateTime)));
             dt_Part.Columns.Add(new DataColumn("UpdateBy", typeof(string)));
             dt_Part.Columns.Add(new DataColumn("UpdateDate", typeof(DateTime)));
+            //dt_Part.Columns.Add(new DataColumn("DeptCode", typeof(string)));
 
 
             //dt_Import
@@ -124,8 +203,9 @@ namespace StockControl
             dt_Import.Columns.Add(new DataColumn("CreateDate", typeof(DateTime)));
             dt_Import.Columns.Add(new DataColumn("UpdateBy", typeof(string)));
             dt_Import.Columns.Add(new DataColumn("UpdateDate", typeof(DateTime)));
+            dt_Import.Columns.Add(new DataColumn("DeptCode", typeof(string)));
 
-           
+
 
         }
         private void Unit_Load(object sender, EventArgs e)
@@ -159,6 +239,7 @@ namespace StockControl
             Set_dt_Print();  // load data print
 
             LoadDefault();
+            //cboDeptCode.Text = dbClss.DeptSC;
             //cboVendor.Text = VNDR;
             //txtVenderName.Text = VNDRName;
             Cath01 = 9;
@@ -198,7 +279,7 @@ namespace StockControl
                 ddlUseTacking.Enabled = ss;
                 cboReplacement.Enabled = ss;
                 chkStopOrder.Enabled = ss;
-
+                txtSafetyStock.Enabled = ss;
                 //lblStock.Text = "0.00";
                 //lblTempStock.Text = "0.00";
                 //lblOrder.Text = "0.00";
@@ -222,7 +303,7 @@ namespace StockControl
                 txtCodeNo.Enabled = ss;
                 txtPartName.Enabled = ss;
                 txtDetailPart.Enabled = ss;
-                cboGroupType.Enabled = ss;
+                //cboGroupType.Enabled = ss;
                 cboTypeCode.Enabled = ss;
                 cboVendor.Enabled = ss;
                 txtMaker.Enabled = ss;
@@ -234,6 +315,7 @@ namespace StockControl
                 ddlUseTacking.Enabled = ss;
                 cboReplacement.Enabled = ss;
                 chkStopOrder.Enabled = ss;
+                txtSafetyStock.Enabled = ss;
 
                 //lblStock.Text = "0.00";
                 //lblTempStock.Text = "0.00";
@@ -258,7 +340,7 @@ namespace StockControl
                 txtCodeNo.Enabled = false;
                 txtPartName.Enabled = ss;
                 txtDetailPart.Enabled = ss;
-                cboGroupType.Enabled = false;
+                cboGroupType.Enabled = true;
                 cboTypeCode.Enabled = ss;
                 cboVendor.Enabled = ss;
                 txtMaker.Enabled = ss;
@@ -270,6 +352,7 @@ namespace StockControl
                 ddlUseTacking.Enabled = ss;
                 cboReplacement.Enabled = ss;
                 chkStopOrder.Enabled = ss;
+                txtSafetyStock.Enabled = ss;
 
                 //lblStock.Text = "0.00";
                 //lblTempStock.Text = "0.00";
@@ -311,6 +394,15 @@ namespace StockControl
                 cboGroupType.DisplayMember = "GroupCode";
                 cboGroupType.ValueMember = "GroupCode";
                 cboGroupType.DataSource = db.tb_GroupTypes.Where(s => s.GroupActive == true).ToList();
+
+                //cboDeptCode.DisplayMember = "DeptAccount";
+                //cboDeptCode.ValueMember = "DeptAccount";
+                //cboDeptCode.DataSource = db.spx_001_GroupDept().Where(d=>d.DeptAccount==dbClss.DeptSC).ToList();
+
+                cboDeptCode.DisplayMember = "DeptCode";
+                cboDeptCode.ValueMember = "DeptName";
+                cboDeptCode.DataSource = db.tb_Departments.Where(d => d.DeptAccount == dbClss.DeptSC).ToList();
+
                 try
                 {
 
@@ -345,11 +437,17 @@ namespace StockControl
             {
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
+                    var gg= db.tb_Types.Where(t => t.TypeActive == true && t.GroupCode.Equals(cboGroupType.Text)).ToList();
                     cboTypeCode.DataSource = null;
                     cboTypeCode.DisplayMember = "TypeCode";
                     cboTypeCode.ValueMember = "TypeCode";
-                    cboTypeCode.DataSource = db.tb_Types.Where(t => t.TypeActive == true && t.GroupCode.Equals(cboGroupType.Text)).ToList();
-                    cboTypeCode.SelectedIndex = 0;
+
+                    cboTypeCode.DataSource = gg;
+                    if (gg.Count > 0)
+                    {
+
+                        cboTypeCode.SelectedIndex = 0;
+                    }
                 }
             }
             catch { }
@@ -363,6 +461,7 @@ namespace StockControl
                     var g = (from ix in db.tb_Items select ix).Where(a => a.CodeNo == txtCodeNo.Text).ToList();
                     if (g.Count() > 0)
                     {
+                        cboDeptCode.Text = g.FirstOrDefault().DeptCode;
                         txtPartName.Text = StockControl.dbClss.TSt(g.FirstOrDefault().ItemNo);
                         txtDetailPart.Text = StockControl.dbClss.TSt(g.FirstOrDefault().ItemDescription);
                         cboGroupType.Text = StockControl.dbClss.TSt(g.FirstOrDefault().GroupCode);
@@ -384,6 +483,7 @@ namespace StockControl
                         txtMimimumStock.Text = StockControl.dbClss.TSt(g.FirstOrDefault().MinimumStock);
                         txtErrorLeadtime.Text = StockControl.dbClss.TSt(g.FirstOrDefault().SD);
                         txtReOrderPoint.Text = StockControl.dbClss.TSt(g.FirstOrDefault().ReOrderPoint);
+                        txtSafetyStock.Text= StockControl.dbClss.TSt(g.FirstOrDefault().SafetyStock);
 
                         txtToolLife.Text = StockControl.dbClss.TSt(g.FirstOrDefault().Toollife);
                         txtSize.Text = StockControl.dbClss.TSt(g.FirstOrDefault().Size);
@@ -557,10 +657,13 @@ namespace StockControl
                         decimal.TryParse(txtLeadTime.Text, out Leadtime);
                         decimal.TryParse(txtToolLife.Text, out Toollife);
                         decimal.TryParse(txtErrorLeadtime.Text, out SD);
+                        decimal.TryParse(txtSafetyStock.Text, out SafetyStock);
 
                         DateTime? UpdateDate =null;
 
                         tb_Item u = new tb_Item();
+                        u.Dept = dbClss.DeptSC;
+                        u.DeptCode = cboDeptCode.Text;
                         u.CodeNo = txtCodeNo.Text.Trim();
                         u.ItemNo = txtPartName.Text.Trim();
                         u.ItemDescription = txtDetailPart.Text.Trim();
@@ -588,7 +691,7 @@ namespace StockControl
                         u.CreateBy = UpdateBy;
                         u.CreateDate = CreateDate;
                         u.UpdateDate = UpdateDate;
-                        u.UpdateBy = "";
+                        u.UpdateBy = UpdateBy;
                         u.SafetyStock = SafetyStock;
                         u.Critical = Critical;
                         u.Status = "Active";
@@ -597,9 +700,9 @@ namespace StockControl
                         u.BarCode = barcode;
                         u.DWGNo = txtDwgfile.Text;
                         u.DWG = chkDWG.Checked;
-                        u.StockDL = 0;//Convert.ToDecimal(lblTempStock.Text);
-                        u.StockInv = 0;// Convert.ToDecimal(lblStock.Text);
-                        u.StockBackOrder = 0;
+                       // u.StockDL = 0;//Convert.ToDecimal(lblTempStock.Text);
+                       // u.StockInv = 0;// Convert.ToDecimal(lblStock.Text);
+                      //  u.StockBackOrder = 0;
                         ///Save Drawing
                         if (chkDWG.Checked)
                         {
@@ -645,6 +748,10 @@ namespace StockControl
 
                                 //if(StockControl.dbClss.TSt(gg.BarCode).Equals(""))
                                 //    gg.BarCode = StockControl.dbClss.SaveQRCode2D(txtCodeNo.Text);
+
+                                gg.Dept = dbClss.DeptSC;
+                                gg.DeptCode = cboDeptCode.Text;
+                               
 
 
                                 if (!txtPartName.Text.Trim().Equals(row["ItemNo"].ToString()))
@@ -736,7 +843,7 @@ namespace StockControl
                                 {
                                     decimal ReOrderPoint = 0; decimal.TryParse(txtReOrderPoint.Text, out ReOrderPoint);
                                     gg.ReOrderPoint = ReOrderPoint;
-                                    dbClss.AddHistory(this.Name , "แก้ไข ทูล", "แก้ไข ReOrder Point [" + txtReOrderPoint.ToString() + "]", txtCodeNo.Text);
+                                    dbClss.AddHistory(this.Name , "แก้ไข ทูล", "แก้ไข Package STD. [" + txtReOrderPoint.ToString() + "]", txtCodeNo.Text);
                                 }
                                 if (!chkStopOrder.Checked.ToString().Trim().Equals(row["StopOrder"].ToString()))
                                 {
@@ -782,13 +889,13 @@ namespace StockControl
                                     gg.DWG = DWG;
                                     dbClss.AddHistory(this.Name  , "แก้ไข ทูล", "แก้ไข Drawing [" + chkDWG.Checked.ToString() + "]", txtCodeNo.Text);
                                 }
-
-                                //if (txtMimimumStock.Text.Trim().Equals(row["SafetyStock"].ToString()))
-                                //{
-                                //    decimal SafetyStock = 0; decimal.TryParse(txtMimimumStock.Text, out MinimumStock);
-                                //    gg.SafetyStock = SafetyStock;
-                                //    dbClss.AddHistory(this.Name + txtCodeNo.Text, "แก้ไข Part", "แก้ไข SafetyStock [" + txtMimimumStock.ToString() + "]", "");
-                                //}
+                                
+                                if (!txtSafetyStock.Text.Trim().Equals(row["SafetyStock"].ToString()))
+                                {
+                                    decimal SafetyStock = 0; decimal.TryParse(txtSafetyStock.Text, out SafetyStock);
+                                    gg.SafetyStock = SafetyStock;
+                                    dbClss.AddHistory(this.Name , "แก้ไข Part", "แก้ไข SafetyStock [" + row["SafetyStock"].ToString() + "]", txtCodeNo.Text);
+                                }
                                 //if (Critical.Text.Trim().Equals(row["Critical"].ToString()))
                                 //{
                                 //    gg.UseTacking = Critical.Text.Trim();
@@ -807,6 +914,7 @@ namespace StockControl
 
                                 C += 1;
                                 db.SubmitChanges();
+                                db.sp_0ResetFix5(CodeNo);
                             }
                         }
                     }
@@ -832,6 +940,9 @@ namespace StockControl
             {
                 //if (txtCodeNo.Text.Equals(""))
                 //    err += " “รหัสพาร์ท:” เป็นค่าว่าง \n";
+
+                if (cboDeptCode.Text.Equals(""))
+                    err += "รหัสแผนกว่างไม่ได้ \n";
                 if (txtPartName.Text.Equals(""))
                     err += " “ชื่อทูล:” เป็นค่าว่าง \n";
                 if (txtDetailPart.Text.Equals(""))
@@ -887,16 +998,16 @@ namespace StockControl
                                 {
                                     string cut_string = "";
                                     cut_string = txtCodeNo.Text.Trim().Substring(0, 1);
-                                    if (!cut_string.ToUpper().Equals(Temp_Running.ToUpper()))
-                                        err += "- “รหัสทูล เริ่มต้นไม่ตรงกับประเภทกลุ่มสินค้า:”  \n";
-                                    else//เช็คว่าเป็น CodeNo ที่มีในระบบหรือไม่ ถ้ามีแล้วจะ New เลขใหม่ไม่ได้ เพราะซ้ำ
-                                    {
+                                    //if (!cut_string.ToUpper().Equals(Temp_Running.ToUpper()))
+                                    //    err += "- “รหัสทูล เริ่มต้นไม่ตรงกับประเภทกลุ่มสินค้า:”  \n";
+                                   //เช็คว่าเป็น CodeNo ที่มีในระบบหรือไม่ ถ้ามีแล้วจะ New เลขใหม่ไม่ได้ เพราะซ้ำ
+                                   
                                         var g1 = (from ix in db.tb_Items select ix).Where(a => a.CodeNo == txtCodeNo.Text.Trim()).ToList();
                                         if (g1.Count() > 0)
                                         {
                                             err += "- “รหัสทูล ซ้ำ:”มีรหัสทูล ในระบบแล้ว  \n";
                                         }
-                                    }
+                                   
                                 }
                                 //err += "- “ประเภทกลุ่ม สินค้า:” เป็นค่าว่าง \n";
                             }
@@ -990,6 +1101,7 @@ namespace StockControl
 
         private void Cleardata()
         {
+            cboDeptCode.Text = "";// dbClss.DeptSC;
             chkGET.Checked = true;
             btnGET.Enabled = false;
             lblStock.Text = "0.00";
@@ -1014,7 +1126,7 @@ namespace StockControl
             chkStopOrder.Checked = false;
             txtShelfNo.Text = "";
             txtMaximumStock.Text = "1.00";
-            txtMimimumStock.Text = "0.00";
+            txtMimimumStock.Text = "1.00";
             txtErrorLeadtime.Text = "0.00";
             txtReOrderPoint.Text = "0.00";
             txtToolLife.Text = "1.00";
@@ -1024,9 +1136,9 @@ namespace StockControl
             lbStatus.Text = "-";
             txtUpdateBy.Text = "";
             txtUpdateDate.Text = "";
-
             txtCreateby.Text = ClassLib.Classlib.User;
             txtCreateDate.Text = DateTime.Now.ToString("dd/MMM/yyyy");
+
 
             chkDWG.Checked = false;
             lblTempAddFile.Text = "";
@@ -1225,17 +1337,20 @@ namespace StockControl
         }
         private void btnImport_Click(object sender, EventArgs e)
         {
-
-            OpenFileDialog op = new OpenFileDialog();
-            op.Filter = "Spread Sheet files (*.csv)|*.csv|All files (*.csv)|*.csv";
-            if (op.ShowDialog() == DialogResult.OK)
+            if (MessageBox.Show("ต้องการนำข้อมูลเข้า หรือไม่?","นำข้อมูลเข้า",MessageBoxButtons.YesNo,MessageBoxIcon.Question)==DialogResult.Yes)
             {
-                using (TextFieldParser parser = new TextFieldParser(op.FileName, Encoding.GetEncoding("windows-874")))
+
+                OpenFileDialog op = new OpenFileDialog();
+                op.Filter = "Spread Sheet files (*.csv)|*.csv|All files (*.csv)|*.csv";
+                if (op.ShowDialog() == DialogResult.OK)
                 {
-                    this.Cursor = Cursors.WaitCursor;
-                    //using (TextFieldParser parser = new TextFieldParser(op.FileName), Encoding.GetEncoding("windows-874")))
-                    //{
+                    using (TextFieldParser parser = new TextFieldParser(op.FileName, Encoding.GetEncoding("windows-874")))
+                    {
+                        this.Cursor = Cursors.WaitCursor;
+                        //using (TextFieldParser parser = new TextFieldParser(op.FileName), Encoding.GetEncoding("windows-874")))
+                        //{
                         dt_Import.Rows.Clear();
+
                         parser.TextFieldType = FieldType.Delimited;
                         parser.SetDelimiters(",");
                         int a = 0;
@@ -1412,41 +1527,41 @@ namespace StockControl
 
                             }
 
-                        if (!GroupCode.Equals("")&& !TypeCode.Equals(""))
-                        {
-                            using (DataClasses1DataContext db = new DataClasses1DataContext())
+                            if (!GroupCode.Equals("") && !TypeCode.Equals(""))
                             {
-                                var g = (from ix in db.tb_Items
-                                         where ix.CodeNo.Trim().ToUpper() == CodeNo.Trim().ToUpper() //&& ix.Status == "Active"
-                                         select ix).ToList();
-                                if (g.Count <= 0)
-                                {
-                                    //CodeNo = Get_CodeNo_GroupCode(GroupCode);
-                                    string Temp_codeno = CodeNo;
-                                    string temp_codeno2 = "";
-                                    if (CodeNo.Length > 5)
-                                    {
-                                        int c1 = txtCodeNo.Text.Length;
+                                //using (DataClasses1DataContext db = new DataClasses1DataContext())
+                                //{
+                                //    var g = (from ix in db.tb_Items
+                                //             where ix.CodeNo.Trim().ToUpper() == CodeNo.Trim().ToUpper() //&& ix.Status == "Active"
+                                //             select ix).ToList();
+                                //    if (g.Count <= 0)
+                                //    {
+                                //        //CodeNo = Get_CodeNo_GroupCode(GroupCode);
+                                //        string Temp_codeno = CodeNo;
+                                //        string temp_codeno2 = "";
+                                //        if (CodeNo.Length > 5)
+                                //        {
+                                //            int c1 = txtCodeNo.Text.Length;
 
-                                        temp_codeno2 = Temp_codeno.Substring(5, c1 - 5);
-                                        CodeNo = Get_CodeNo_GroupCode(GroupCode);
-                                        CodeNo = CodeNo + temp_codeno2;
-                                    }
-                                    else
-                                        CodeNo = Get_CodeNo_GroupCode(GroupCode);
-           
-                                }
+                                //            temp_codeno2 = Temp_codeno.Substring(5, c1 - 5);
+                                //            CodeNo = Get_CodeNo_GroupCode(GroupCode);
+                                //            CodeNo = CodeNo + temp_codeno2;
+                                //        }
+                                //        else
+                                //            CodeNo = Get_CodeNo_GroupCode(GroupCode);
+
+                                //    }
+                                //}
                             }
-                        }
 
                             //dt_Kanban.Rows.Add(rd);
-                        if (CodeNo.ToString().Equals("") || ItemNo.ToString().Equals("")
-                               || ItemDescription.ToString().Equals("") || GroupCode.ToString().Equals("")
-                               || TypeCode.ToString().Equals("") || VendorNo.ToString().Equals("") || VendorItemName.ToString().Equals("")
-                               || Maker.ToString().Equals("") || StandardCost.ToString().Equals("") || UnitBuy.ToString().Equals("")
-                               || UnitShip.ToString().Equals("") || PCSUnit.ToString().ToString().Equals("") || Leadtime.ToString().Equals("")
-                               || MaximumStock.ToString().Equals("") || MinimumStock.ToString().Equals("") || SD.ToString().Equals("")
-                               )
+                            if (CodeNo.ToString().Equals("") || ItemNo.ToString().Equals("")
+                                   || ItemDescription.ToString().Equals("") || GroupCode.ToString().Equals("")
+                                   || TypeCode.ToString().Equals("") || VendorNo.ToString().Equals("") || VendorItemName.ToString().Equals("")
+                                   || Maker.ToString().Equals("") || StandardCost.ToString().Equals("") || UnitBuy.ToString().Equals("")
+                                   || UnitShip.ToString().Equals("") || PCSUnit.ToString().ToString().Equals("") || Leadtime.ToString().Equals("")
+                                   || MaximumStock.ToString().Equals("") || MinimumStock.ToString().Equals("") || SD.ToString().Equals("")
+                                   )
                             {
 
                             }
@@ -1477,10 +1592,331 @@ namespace StockControl
 
                         //DataLoad();
                     }
-                //}
+                    //}
+                }
+                this.Cursor = Cursors.Default;
             }
-            this.Cursor = Cursors.Default;
 
+        }
+
+        private void btnImport2_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("ต้องการนำข้อมูลเข้า หรือไม่?", "นำข้อมูลเข้า", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                openFileDialog1.Filter = "Excel files (*.xlsx)|*.xlsx";
+                openFileDialog1.FilterIndex = 2;
+                openFileDialog1.RestoreDirectory = true;
+                openFileDialog1.FileName = "";
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+
+                    // txtPath.Text = openFileDialog1.FileName;
+                    UploadExcel(openFileDialog1.FileName);
+                }
+            }
+        }
+      private void UploadExcel(string Path)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            try
+            {
+
+                ////Code here
+                string VendorName = "";
+                string Vendor = "";
+                string Remark = "";
+                decimal pcsunit = 1;
+                string unit = "PCS";
+                string sUnit = "PCS";
+                decimal MaxQty = 1;
+                decimal MinQty = 0;
+                decimal ReOrder = 0;
+                int Leadtime = 30;
+                decimal Safety = 0;
+                string Maker = "";
+                decimal Cost = 0;
+                string Shelf = "";
+                string CodeNo = "";
+                string PartNo = "";
+                string Group = "";
+                string PartName = "";
+                string Dept = "";
+                string DeptCode = "";
+                string Lot = "";
+                
+
+
+                ////SA
+                Excel.Application excelApp = new Excel.Application();
+                Excel.Workbook excelBook = excelApp.Workbooks.Open(
+                  Path, 0, true, 5,
+                  "", "", true, Excel.XlPlatform.xlWindows, "\t", false, false,
+                  0, true);
+                Excel.Sheets sheets = excelBook.Worksheets;
+                Excel.Worksheet worksheet = (Excel.Worksheet)sheets.get_Item(1);
+                int countP = 300;
+               
+                int EndofTAG = 0;
+                int Rowx = 2;
+            
+                //int countRow = 0;
+
+
+         
+                int countRow = 0;
+                int rows = 0;
+
+
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {                   
+                   
+             
+                    int ToolLife = 0;
+
+                    Rowx = 2;
+                    for (int ixi = 0; ixi < countP; ixi++)
+                    {
+                        //while (EndofTAG == 1)
+                        //{
+                        try
+                        {
+                            rows += 1;
+                            if (Rowx < countP)
+                            {
+                               
+                            }
+
+                            System.Array myvalues;
+                            Excel.Range range = worksheet.get_Range("A" + Rowx.ToString(), "W" + Rowx.ToString());
+
+
+                            myvalues = (System.Array)range.Cells.Value;
+                            string[] strArray = ConvertToStringArray(myvalues);
+
+                            if (!Convert.ToString(strArray[1]).Equals("") &&
+                                !Convert.ToString(strArray[4]).Equals("")
+                                )
+                            {
+
+                                countRow += 1;
+                                //Insert Value/// 
+                                ToolLife = 0;
+                                Cost = 0;
+                                MaxQty = 0;
+                                MinQty = 0;
+                                Leadtime = 0;
+                                pcsunit = 1;
+
+
+
+
+                                Dept = Convert.ToString(strArray[1]);
+                                DeptCode = Convert.ToString(strArray[2]);
+                                Group = Convert.ToString(strArray[3]);
+                                CodeNo = Convert.ToString(strArray[4]);
+                                PartNo = Convert.ToString(strArray[5]);
+                                PartName = Convert.ToString(strArray[6]);
+                                Shelf = Convert.ToString(strArray[7]);
+                                Remark = Convert.ToString(strArray[8]);
+                                Lot= Convert.ToString(strArray[22]);
+                                if (Dept == "MM")
+                                {
+                                    int.TryParse(Convert.ToString(strArray[8]), out ToolLife);
+                                    Remark = "";
+                                }
+                                decimal.TryParse(Convert.ToString(strArray[11]), out Cost);
+                                decimal.TryParse(Convert.ToString(strArray[13]), out pcsunit);
+                                sUnit = Convert.ToString(strArray[14]);
+                                unit = Convert.ToString(strArray[14]);
+
+                                Vendor = Convert.ToString(strArray[15]);
+                                VendorName = Convert.ToString(strArray[16]);
+                                Maker = Convert.ToString(strArray[17]);
+                                int.TryParse(Convert.ToString(strArray[18]), out Leadtime);
+                                decimal.TryParse(Convert.ToString(strArray[20]), out MaxQty);
+                                decimal.TryParse(Convert.ToString(strArray[19]), out MinQty);
+                                decimal.TryParse(Convert.ToString(strArray[9]), out ReOrder);
+                                decimal.TryParse(Convert.ToString(strArray[21]), out Safety);
+
+                                tb_Vendor vs = db.tb_Vendors.Where(v => v.VendorNo == Vendor).FirstOrDefault();
+                                if (vs != null)
+                                {
+                                    VendorName = vs.VendorName;
+                                }
+                                else
+                                {
+                                    if (Vendor.Equals(""))
+                                    {
+                                        Vendor = "TEMP";
+                                        VendorName = "TEMPORARY VENDOR";
+                                    }
+                                }
+
+
+                                tb_Item ic = db.tb_Items.Where(i => i.CodeNo.Equals(CodeNo)).FirstOrDefault();
+                                {
+                                    if (ic != null)
+                                    {
+                                        ic.MaximumStock = MaxQty;
+                                        ic.MinimumStock = MinQty;
+                                        ic.ShelfNo = Shelf;
+                                        ic.Leadtime = Leadtime;
+                                        ic.Remark = Remark;
+                                        ic.Toollife = ToolLife;
+                                        ic.UnitBuy = unit;
+                                        ic.UnitShip = unit;
+                                        ic.Maker = Maker;
+                                        ic.VendorNo = Vendor;
+                                        ic.PCSUnit = pcsunit;
+                                        ic.Dept = Dept;
+                                        ic.DeptCode = DeptCode;
+                                        ic.SafetyStock = Safety;
+                                        ic.ReOrderPoint = ReOrder;
+                                        ic.UseTacking = Lot;
+                                        db.SubmitChanges();
+                                    }
+                                    else
+                                    {
+                                        if (pcsunit == 0)
+                                            pcsunit = 1;
+                                        if (Maker.Equals(""))
+                                            Maker = " ";
+                                        EndofTAG += 1;
+                                        //////Insert/////
+                                        tb_Item im = new tb_Item();
+                                        im.Dept = Dept;
+                                        im.DeptCode = DeptCode;
+                                        im.CodeNo = CodeNo;
+                                        im.ItemNo = PartNo;
+                                        im.ItemDescription = PartName;
+                                        im.GroupCode = Group;
+                                        im.TypeCode = Group;
+                                        im.ShelfNo = Shelf;
+                                        im.SD = 0;                                        
+                                        im.Replacement = "สั่งซื้อ";                                       
+                                        im.Critical = false;
+                                        im.CreateBy = dbClss.UserID;
+                                        im.CreateDate = DateTime.Now;
+                                        im.BarCode = null;
+                                        im.AvgCost = 0;
+                                        im.CostingMethod = "FIFO";
+                                        im.DWG = false;
+                                        im.DWGNo = "";
+                                        im.Size = "";
+                                        im.Status = "Active";
+                                        im.UnitBuy = unit;
+                                        im.UnitShip = unit;
+                                        im.VendorNo = Vendor;
+                                        im.VendorItemName = VendorName;                                        
+                                        im.StandardCost = Cost;
+                                        im.PCSUnit = pcsunit;
+                                        im.Leadtime = Leadtime;
+                                        im.Maker = Maker;
+                                        im.MaximumStock = MaxQty;
+                                        im.MinimumStock = MinQty;
+                                        im.ReOrderPoint = ReOrder;
+                                        im.SafetyStock = Safety;
+                                        im.Toollife = ToolLife;
+                                        im.StockInv = 0;
+                                        im.StopOrder = false;
+                                        im.StockDL = 0;
+                                        im.StockBackOrder = 0;
+                                        im.UseTacking = Lot;
+                                        
+
+                                        db.tb_Items.InsertOnSubmit(im);
+                                        db.SubmitChanges();
+
+
+
+                                    }
+
+
+                                }
+                            }
+
+
+
+
+                            Rowx += 1;
+
+                        }
+                        catch (Exception ex)
+                        {
+                            excelBook.Close();
+                            excelApp.Quit();
+                            this.Cursor = Cursors.Default;
+                            MessageBox.Show(ex.Message);
+                        }
+
+                       
+                    }
+                    
+
+                    //excelBook.Save();
+
+                    excelBook.Close(0);
+                    excelApp.Quit();
+
+                    releaseObject(worksheet);
+                    releaseObject(excelBook);
+                    releaseObject(excelApp);
+                    Marshal.FinalReleaseComObject(worksheet);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelBook);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                    GC.GetTotalMemory(false);
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    GC.GetTotalMemory(true);
+                    /////////////////////////////////////
+
+                    MessageBox.Show("Import Completed.\n row=" + countRow);
+                    DataLoad();
+
+                }
+
+
+                ////////////
+            }
+            catch (Exception ex) { this.Cursor = Cursors.Default; MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            this.Cursor = Cursors.Default;
+            
+        }
+      private string[] ConvertToStringArray(System.Array values)
+        {
+
+            // create a new string array
+            string[] theArray = new string[values.Length];
+
+            // loop through the 2-D System.Array and populate the 1-D String Array
+            for (int i = 1; i <= values.Length; i++)
+            {
+                if (values.GetValue(1, i) == null)
+                    theArray[i - 1] = "";
+                else
+                    theArray[i - 1] = (string)values.GetValue(1, i).ToString();
+            }
+
+            return theArray;
+        }
+        private void releaseObject(object obj)
+        {
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                obj = null;
+                // MessageBox.Show("Exception Occured while releasing object " + ex.ToString());
+            }
+            finally
+            {
+                GC.Collect();
+            }
         }
 
         private void ImportData()
@@ -1500,6 +1936,7 @@ namespace StockControl
                                      select ix).ToList();
                             if (g.Count > 0)  //มีรายการในระบบ อัพเดต
                             {
+                                /*
 
                                 var gg = (from ix in db.tb_Items
                                           where ix.CodeNo.Trim() == rd["CodeNo"].ToString().Trim()
@@ -1549,6 +1986,7 @@ namespace StockControl
                                 gg.DWG = DWG;
 
                                 db.SubmitChanges();
+                                */
                             }
                             else   // Add ใหม่
                             {
@@ -1587,7 +2025,6 @@ namespace StockControl
                                 decimal.TryParse(rd["SD"].ToString(), out SD);
 
                                 DateTime? UpdateDate = null;
-
                                 tb_Item u = new tb_Item();
                                 u.CodeNo = rd["CodeNo"].ToString().Trim();
                                 u.ItemNo = rd["ItemNo"].ToString().Trim();
@@ -1628,6 +2065,8 @@ namespace StockControl
                                 u.StockDL = StockDL;
                                 u.StockInv = StockInv;
                                 u.StockBackOrder = StockBackOrder;
+                                u.Dept = dbClss.DeptSC;
+                                u.DeptCode = rd["DeptCode"].ToString();
 
                                 db.tb_Items.InsertOnSubmit(u);
                                 db.SubmitChanges();
@@ -2294,6 +2733,43 @@ namespace StockControl
             {
                 btnGET.Enabled = true;
                 txtCodeNo.Enabled = false;
+            }
+        }
+
+        private void radButtonElement2_Click(object sender, EventArgs e)
+        {
+            using (DataClasses1DataContext db = new DataClasses1DataContext())
+            {
+                string CodeNo2 = "";
+                CodeNo2= Interaction.InputBox("Change Item No. " + txtCodeNo.Text, "Do you want change Item No.?", "");
+
+                if(!CodeNo2.Equals(""))
+                {
+                   if(MessageBox.Show("ต้องการเปลี่ยน "+txtCodeNo.Text+" -> "+CodeNo2+" หรือไม่ ?","เปลี่ยนรหัสโค้ด",MessageBoxButtons.YesNo,MessageBoxIcon.Question)==DialogResult.Yes)
+                    {
+                        db.spx25_ChangeItemCodeNo(txtCodeNo.Text, CodeNo2);
+                        dbClss.AddHistory(this.Name, "Change Item Code",  txtCodeNo.Text.Trim(), CodeNo2);
+                        MessageBox.Show("Change Completed.!!!");
+                        this.Close();
+                    }
+                }
+            }
+        }
+
+        private void radButtonElement3_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("ต้องการ Re-Active", "Change Status", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    tb_Item tm = db.tb_Items.Where(t => t.CodeNo.Equals(txtCodeNo.Text)).FirstOrDefault();
+                    if (tm != null)
+                    {
+                        tm.Status = "Active";
+                        db.SubmitChanges();
+                        MessageBox.Show("เปลี่ยนเรียบร้อยแล้ว");
+                    }
+                }
             }
         }
     }

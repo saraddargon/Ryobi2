@@ -109,7 +109,7 @@
             // 
             // 
             this.radRibbonBar1.RootElement.AutoSizeMode = Telerik.WinControls.RadAutoSizeMode.WrapAroundChildren;
-            this.radRibbonBar1.Size = new System.Drawing.Size(730, 161);
+            this.radRibbonBar1.Size = new System.Drawing.Size(730, 160);
             this.radRibbonBar1.StartButtonImage = ((System.Drawing.Image)(resources.GetObject("radRibbonBar1.StartButtonImage")));
             this.radRibbonBar1.StartMenuItems.AddRange(new Telerik.WinControls.RadItem[] {
             this.radMenuItem1,
@@ -131,6 +131,7 @@
             this.radRibbonBarGroup5});
             this.ribbonTab1.Name = "ribbonTab1";
             this.ribbonTab1.Text = "Action";
+            this.ribbonTab1.UseMnemonic = false;
             // 
             // radRibbonBarGroup1
             // 
@@ -325,7 +326,6 @@
             this.radStatusStrip1.Size = new System.Drawing.Size(730, 26);
             this.radStatusStrip1.SizingGrip = false;
             this.radStatusStrip1.TabIndex = 1;
-            this.radStatusStrip1.Text = "radStatusStrip1";
             // 
             // radLabelElement1
             // 
@@ -339,9 +339,9 @@
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Controls.Add(this.radGridView1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 161);
+            this.panel1.Location = new System.Drawing.Point(0, 160);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(730, 332);
+            this.panel1.Size = new System.Drawing.Size(730, 333);
             this.panel1.TabIndex = 2;
             // 
             // radGridView1
@@ -381,12 +381,10 @@
             gridViewTextBoxColumn1.Name = "TypeCode";
             gridViewTextBoxColumn1.Width = 134;
             gridViewTextBoxColumn2.FieldName = "TypeDetail";
-            gridViewTextBoxColumn2.FormatInfo = new System.Globalization.CultureInfo("");
             gridViewTextBoxColumn2.HeaderText = "รายละเอียดประเภท";
             gridViewTextBoxColumn2.Name = "TypeDetail";
             gridViewTextBoxColumn2.Width = 263;
             gridViewCheckBoxColumn1.FieldName = "TypeActive";
-            gridViewCheckBoxColumn1.FormatInfo = new System.Globalization.CultureInfo("");
             gridViewCheckBoxColumn1.HeaderText = "สถานะการใช้งาน";
             gridViewCheckBoxColumn1.Name = "TypeActive";
             gridViewCheckBoxColumn1.Width = 92;
@@ -429,9 +427,8 @@
             this.radContextMenuManager1.SetRadContextMenu(this.radGridView1, this.radContextMenu1);
             this.radGridView1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.radGridView1.ShowGroupPanel = false;
-            this.radGridView1.Size = new System.Drawing.Size(730, 332);
+            this.radGridView1.Size = new System.Drawing.Size(730, 333);
             this.radGridView1.TabIndex = 0;
-            this.radGridView1.Text = "Grid";
             this.radGridView1.ThemeName = "Office2010Blue";
             this.radGridView1.CellFormatting += new Telerik.WinControls.UI.CellFormattingEventHandler(this.radGridView1_CellFormatting);
             this.radGridView1.CellEndEdit += new Telerik.WinControls.UI.GridViewCellEventHandler(this.radGridView1_CellEndEdit);

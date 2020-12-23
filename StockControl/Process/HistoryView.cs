@@ -15,14 +15,42 @@ namespace StockControl
         {
             InitializeComponent();
             ScreenSearch = Screen;
-            this.Text = "ประวัติ "+ Screen;
+            this.Text = "History "+ Screen;
+            CallLang();
         }
         public HistoryView(string Screen,string Refno)
         {
             InitializeComponent();
             ScreenSearch = Screen;
-            this.Text = "ประวัติ " + Screen;
+            this.Text = "History " + Screen;
             RefNo = Refno;
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "History. View";
+                radLabelElement1.Text = "Status: History View";
+                btnRefresh.Text = "Refresh";               
+                btnExport.Text = "Export";               
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "No";
+                radGridView1.Columns[1].HeaderText = "DateTime";
+                radGridView1.Columns[2].HeaderText = "Topic";
+                radGridView1.Columns[3].HeaderText = "Detail";
+                radGridView1.Columns[4].HeaderText = "Ref.No";
+                radGridView1.Columns[5].HeaderText = "UserID";
+
+
+
+
+            }
         }
         string ScreenSearch = "";
         string RefNo = "";

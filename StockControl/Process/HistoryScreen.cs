@@ -15,6 +15,34 @@ namespace StockControl
         {
             InitializeComponent();
             ScreenSearch = Screen;
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "History. Screen";
+                radLabelElement1.Text = "Status: History Screen";
+                btnRefresh.Text = "Refresh";
+                btnExport.Text = "Export";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+                btnView.Text = "Check History";
+
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "No";
+                radGridView1.Columns[1].HeaderText = "Screen";
+                // radGridView1.Columns[2].HeaderText = "Dept.Code Tool";
+                //radGridView1.Columns[3].HeaderText = "Fax";
+                //radGridView1.Columns[4].HeaderText = "Email";
+                //radGridView1.Columns[5].HeaderText = "VendorNo.";
+
+
+
+
+            }
         }
         string ScreenSearch = "";
         //private int RowView = 50;

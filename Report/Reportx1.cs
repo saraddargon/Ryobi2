@@ -232,6 +232,27 @@ namespace Report
                     }
                     break;
 
+                case "ReportStockCard":
+                    {
+
+                        rptDc.SetParameterValue("@Code", Convert.ToString(Value[0].ToString()));                        
+                        rptDc.SetParameterValue("@Datex", DateTime.Now);
+                        // rptDc.SetParameterValue("@Action", Convert.ToInt32(ClassReport.Value[1]));
+                    }
+                    break;
+                case "ReportCheckStock":
+                    {
+                        rptDc.SetParameterValue("@CheckNo", Convert.ToString(Value[0].ToString()));
+                        rptDc.SetParameterValue("@Datex", DateTime.Now);
+                    }
+                    break;
+                case "Report_CostCenter":
+                    {
+                        rptDc.SetParameterValue("@Date1", Convert.ToDateTime(Value[0].ToString()));
+                        rptDc.SetParameterValue("@Date2", Convert.ToDateTime(Value[1].ToString()));
+                    }
+                    break;
+
 
             }
         }

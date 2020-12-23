@@ -16,8 +16,41 @@ namespace StockControl
             InitializeComponent();
             VNDR = VNDRNo;
             VNDRName = VendorName;
+            CallLang();
         }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Contact";
+                radLabelElement1.Text = "Status: Contact";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+                radLabel1.Text = "Vendor No.";
+                radLabel2.Text = "Vendor Name:";
 
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Default";
+                radGridView1.Columns[1].HeaderText = "Contact";
+                radGridView1.Columns[2].HeaderText = "Phone";
+                radGridView1.Columns[3].HeaderText = "Fax";
+                radGridView1.Columns[4].HeaderText = "Email";
+                radGridView1.Columns[5].HeaderText = "VendorNo.";
+
+
+
+
+            }
+        }
         //private int RowView = 50;
         //private int ColView = 10;
         private string VNDR = "";

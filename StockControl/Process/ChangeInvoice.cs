@@ -16,6 +16,21 @@ namespace StockControl
         public ChangeInvoice()
         {
             InitializeComponent();
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if(dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Change Inv.";
+                radLabelElement1.Text = "Change Inv.";
+                btnRefresh.Text = "Refresh";
+                btnSave.Text = "Change";
+                btnPrint.Text = "Print";
+                radButton1.Text = "Select";
+                radLabel1.Text = "Old Invoice No.";
+                radLabel2.Text = "New Invoice No.";
+            }
         }
 
         //private int RowView = 50;

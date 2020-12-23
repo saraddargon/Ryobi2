@@ -16,6 +16,7 @@ namespace StockControl
         public AdjustStock_List()
         {
             InitializeComponent();
+            CallLang();
         }
         Telerik.WinControls.UI.RadTextBox ADNo_tt = new Telerik.WinControls.UI.RadTextBox();
         Telerik.WinControls.UI.RadTextBox CodeNo_tt = new Telerik.WinControls.UI.RadTextBox();
@@ -28,8 +29,50 @@ namespace StockControl
             ADNo_tt = ADNoxxx;
             CodeNo_tt = CodeNoxxx;
             screen = 1;
+            CallLang();
         }
+        private void CallLang()
+        {
+            if(dbClss.Language.Equals("ENG"))
+            {
+                btnSave.Text = "Open Doc.";
+                btnPrint.Text = "Print";
+                btnExport.Text = "Export";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                btnRefresh.Text = "Refresh";
+                this.Text = "Adjust Stock List";
+                radLabelElement1.Text = "Adjust Stock List";
 
+                radButton1.Text = "Search..";
+
+                radLabel1.Text = "Adj No.:";
+                radLabel2.Text = "Status :";
+                radLabel3.Text = "Select Date:";
+                radLabel6.Text = "CodeNo.";
+                radLabel7.Text = "Description:";
+                radLabel4.Text = "To";
+                radLabel5.Text = "Case Searh All need to Select Date.";
+
+                dgvData.Columns[0].HeaderText = "No";
+                dgvData.Columns[1].HeaderText = "Status";
+                dgvData.Columns[2].HeaderText = "Ref.No";
+                dgvData.Columns[3].HeaderText = "Dept.Code";
+                dgvData.Columns[4].HeaderText = "Code No.";
+                dgvData.Columns[5].HeaderText = "ToolName";
+                dgvData.Columns[6].HeaderText = "Description";
+                dgvData.Columns[7].HeaderText = "Adjust Q'ty";
+                dgvData.Columns[8].HeaderText = "Unit";
+                dgvData.Columns[9].HeaderText = "Pcs/Unit";
+                dgvData.Columns[10].HeaderText = "Amount";
+                dgvData.Columns[11].HeaderText = "VendorName";
+                dgvData.Columns[12].HeaderText = "CreateBy";
+                dgvData.Columns[13].HeaderText = "CreateDate";
+                dgvData.Columns[14].HeaderText = "LotNo.";
+                dgvData.Columns[15].HeaderText = "Purpose";
+
+            }
+        }
         DataTable dt = new DataTable();
         private void radMenuItem2_Click(object sender, EventArgs e)
         {
@@ -65,8 +108,12 @@ namespace StockControl
        
         private void Unit_Load(object sender, EventArgs e)
         {
-            dtDate1.Value = DateTime.Now;
-            dtDate2.Value = DateTime.Now;
+            var today = DateTime.Now;
+            var month = new DateTime(today.Year, today.Month, 1);
+            var first = month;
+            var last = month.AddMonths(1).AddDays(-1);
+            dtDate1.Value = first;
+            dtDate2.Value = last;
            
             dgvData.AutoGenerateColumns = false;
             GETDTRow();
@@ -171,12 +218,13 @@ namespace StockControl
 
                 this.Cursor = Cursors.WaitCursor;
                 dgvData.Rows.Clear();
+                dgvData.DataSource = null;
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
                     
                     try
                     {
-                        Load_Adjust();
+                        dgvData.DataSource = db.spx_008_selectAdjustList(dbClss.DeptSC, chkDate.Checked, dtDate1.Value, dtDate2.Value, txtCodeNo.Text, txtItemDescription.Text, txtADNo.Text, cboStatus.Text).ToList();
                         int rowcount = 0;
                         foreach (var x in dgvData.Rows)
                         {
@@ -482,6 +530,11 @@ namespace StockControl
 
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            DataLoad();
         }
     }
 }

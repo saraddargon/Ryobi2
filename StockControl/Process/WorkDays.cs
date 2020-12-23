@@ -14,8 +14,42 @@ namespace StockControl
         public WorkDays()
         {
             InitializeComponent();
+            CallLang();
         }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Work Days";
+                radLabelElement1.Text = "Status: Work. List";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+                radButton1.Text = "Search..";
+                radLabel1.Text = "Select Year:";
 
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Year";
+                radGridView1.Columns[1].HeaderText = "Month";
+                radGridView1.Columns[2].HeaderText = "Days";
+                //radGridView1.Columns[3].HeaderText = "Fax";
+                //radGridView1.Columns[4].HeaderText = "Email";
+                //radGridView1.Columns[5].HeaderText = "VendorNo.";
+
+
+
+
+            }
+        }
         //private int RowView = 50;
         //private int ColView = 10;
         DataTable dt = new DataTable();
@@ -39,6 +73,7 @@ namespace StockControl
         }
         private void Unit_Load(object sender, EventArgs e)
         {
+            cboYear.Text = DateTime.Now.Year.ToString();
             RMenu3.Click += RMenu3_Click;
             RMenu4.Click += RMenu4_Click;
             RMenu5.Click += RMenu5_Click;

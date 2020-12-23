@@ -1094,7 +1094,7 @@ namespace StockControl
         {
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
-                db.sp_004_Update_Receive_Remain(PRID, PRNo, TempNo, RemainQty);
+                //db.sp_004_Update_Receive_Remain(PRID, PRNo, TempNo, RemainQty);
 
                 //string RCNo = "";
                 //var e = (from ix in db.tb_Receives

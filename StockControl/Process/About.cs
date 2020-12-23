@@ -18,7 +18,14 @@ namespace StockControl
 
         private void About_Load(object sender, EventArgs e)
         {
-
+            if(dbClss.Language.Equals("ENG"))
+            {
+                label1.Text = "Info Software System";
+                label2.Text = "Software Name:";
+                label3.Text = "Version :";
+                label4.Text = "Company";
+                label5.Text = "Develop by";
+            }
         }
     }
 }

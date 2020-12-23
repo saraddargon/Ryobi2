@@ -50,7 +50,7 @@
             // txtxy
             // 
             this.txtxy.AutoSize = true;
-            this.txtxy.Location = new System.Drawing.Point(12, 9);
+            this.txtxy.Location = new System.Drawing.Point(12, 0);
             this.txtxy.Name = "txtxy";
             this.txtxy.Size = new System.Drawing.Size(17, 13);
             this.txtxy.TabIndex = 1;

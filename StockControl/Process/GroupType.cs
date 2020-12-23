@@ -13,9 +13,46 @@ namespace StockControl
     {
         public GroupType()
         {
+            this.Name = "GroupType";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
-        }
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
 
+
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Group Type List";
+                radLabelElement1.Text = "Status: Group Type";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Group Code.";
+                radGridView1.Columns[1].HeaderText = "Description";
+                radGridView1.Columns[2].HeaderText = "Status";
+
+
+
+
+            }
+        }
         //private int RowView = 50;
         //private int ColView = 10;
         DataTable dt = new DataTable();
@@ -150,6 +187,7 @@ namespace StockControl
                                     gy.GroupActive = Convert.ToBoolean(g.Cells["GroupActive"].Value);
                                     gy.GroupName= Convert.ToString(g.Cells["GroupName"].Value);
                                     gy.Running= Convert.ToString(g.Cells["Running"].Value);
+                                    gy.Dept = dbClss.DeptSC;
                                     db.tb_GroupTypes.InsertOnSubmit(gy);
                                     db.SubmitChanges();
                                     C += 1;
@@ -209,7 +247,8 @@ namespace StockControl
                                 {
 
                                     var unit1 = (from ix in db.tb_GroupTypes
-                                                 where ix.GroupCode == CodeDelete
+                                                 where ix.GroupCode == CodeDelete 
+                                                 //&& ix.Dept==dbClss.DeptSC
                                                  select ix).ToList();
                                     foreach (var d in unit1)
                                     {

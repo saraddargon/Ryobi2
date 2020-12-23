@@ -13,7 +13,45 @@ namespace StockControl
     {
         public Unit()
         {
+            this.Name = "Unit";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+
+
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Unit List";
+                radLabelElement1.Text = "Status: Unit";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+               // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Unit";
+                radGridView1.Columns[1].HeaderText = "Description";
+                radGridView1.Columns[2].HeaderText = "Status";
+               
+
+
+
+            }
         }
 
         //private int RowView = 50;

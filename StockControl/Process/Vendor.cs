@@ -16,9 +16,52 @@ namespace StockControl
     {
         public Vendor()
         {
+            this.Name = "Vendor";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
-        }
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
 
+
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Vendor Detail!!";
+                radLabelElement1.Text = "Vendor Detail!!";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+                radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "VendorNo";
+                radGridView1.Columns[1].HeaderText = "VendorName";
+                radGridView1.Columns[2].HeaderText = "Address";
+                radGridView1.Columns[3].HeaderText = "CRRNCY";
+                radGridView1.Columns[4].HeaderText = "Remark";
+                radGridView1.Columns[5].HeaderText = "Status";
+                radGridView1.Columns[6].HeaderText = "Contact";
+                radGridView1.Columns[7].HeaderText = "Phone";
+                radGridView1.Columns[8].HeaderText = "Fax";
+                radGridView1.Columns[9].HeaderText = "Email";
+
+
+
+            }
+        }
         //private int RowView = 50;
         //private int ColView = 10;
         DataTable dt = new DataTable();
@@ -149,7 +192,7 @@ namespace StockControl
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                
-                var g = (from ix in db.sp_SelectVendor() select ix).ToList();
+                var g = (from ix in db.sp_SelectVendor(dbClss.DeptSC) select ix).ToList();
                 DataTable dt2 = ClassLib.Classlib.LINQToDataTable(g);
                 radGridView1.DataSource = dt2;
                 int ck = 0;
@@ -158,7 +201,7 @@ namespace StockControl
                     x.Cells["dgvCodeTemp"].Value = x.Cells["VendorNo"].Value.ToString();
                     x.Cells["dgvCodeTemp2"].Value = x.Cells["VendorName"].Value.ToString();
 
-                    x.Cells["VendorNo"].ReadOnly = true;
+                   // x.Cells["VendorNo"].ReadOnly = true;
                     x.Cells["VendorNo"].Style.ForeColor = Color.MidnightBlue;
                     x.Cells["VendorNo"].Style.Font = new Font ("Tahoma",8,FontStyle.Italic);
                     if (row >= 0 && row == ck)
@@ -181,7 +224,7 @@ namespace StockControl
 
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
-                int i = (from ix in db.tb_GroupTypes where ix.GroupCode == code select ix).Count();
+                int i = (from ix in db.tb_GroupTypes where ix.GroupCode == code && ix.Dept==dbClss.DeptSC select ix).Count();
                 if (i > 0)
                     ck = false;
                 else
@@ -217,12 +260,14 @@ namespace StockControl
 
 
                                     tb_Vendor gy = new tb_Vendor();
-                                    gy.VendorNo = dbClss.GetNo(1, 2);
+                                    // gy.VendorNo = dbClss.GetNo(1, 2);
+                                    gy.VendorNo = Convert.ToString(g.Cells["VendorNo"].Value);
                                     gy.Active = Convert.ToBoolean(g.Cells["Active"].Value);
                                     gy.VendorName= Convert.ToString(g.Cells["VendorName"].Value);
                                     gy.CRRNCY = Convert.ToString(g.Cells["CRRNCY"].Value);
                                     gy.Address = Convert.ToString(g.Cells["Address"].Value);
                                     gy.Remark = Convert.ToString(g.Cells["Remark"].Value);
+                                    gy.Dept = dbClss.DeptSC;
                                     db.tb_Vendors.InsertOnSubmit(gy);
                                     db.SubmitChanges();
                                     dbClss.AddHistory(this.Name, "เพิ่มผู้ขาย", "เพิ่มผู้ขาย [" + gy.VendorName+ "]","");

@@ -89,7 +89,7 @@
             // 
             // 
             this.radRibbonBar1.RootElement.AutoSizeMode = Telerik.WinControls.RadAutoSizeMode.WrapAroundChildren;
-            this.radRibbonBar1.Size = new System.Drawing.Size(487, 161);
+            this.radRibbonBar1.Size = new System.Drawing.Size(487, 160);
             this.radRibbonBar1.StartButtonImage = ((System.Drawing.Image)(resources.GetObject("radRibbonBar1.StartButtonImage")));
             this.radRibbonBar1.StartMenuItems.AddRange(new Telerik.WinControls.RadItem[] {
             this.radMenuItem1,
@@ -109,6 +109,7 @@
             this.radRibbonBarGroup3});
             this.ribbonTab1.Name = "ribbonTab1";
             this.ribbonTab1.Text = "Action";
+            this.ribbonTab1.UseMnemonic = false;
             // 
             // radRibbonBarGroup1
             // 
@@ -191,7 +192,6 @@
             this.radStatusStrip1.Size = new System.Drawing.Size(487, 26);
             this.radStatusStrip1.SizingGrip = false;
             this.radStatusStrip1.TabIndex = 1;
-            this.radStatusStrip1.Text = "radStatusStrip1";
             // 
             // radLabelElement1
             // 
@@ -205,9 +205,9 @@
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Controls.Add(this.radPanel1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 161);
+            this.panel1.Location = new System.Drawing.Point(0, 160);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(487, 245);
+            this.panel1.Size = new System.Drawing.Size(487, 246);
             this.panel1.TabIndex = 2;
             // 
             // radPanel1
@@ -221,7 +221,7 @@
             this.radPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.radPanel1.Location = new System.Drawing.Point(0, 0);
             this.radPanel1.Name = "radPanel1";
-            this.radPanel1.Size = new System.Drawing.Size(487, 245);
+            this.radPanel1.Size = new System.Drawing.Size(487, 246);
             this.radPanel1.TabIndex = 0;
             this.radPanel1.ThemeName = "Office2010Blue";
             this.radPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.radPanel1_Paint);
@@ -256,17 +256,19 @@
             // 
             // radLabel2
             // 
+            this.radLabel2.AutoSize = false;
             this.radLabel2.Location = new System.Drawing.Point(68, 86);
             this.radLabel2.Name = "radLabel2";
-            this.radLabel2.Size = new System.Drawing.Size(150, 18);
+            this.radLabel2.Size = new System.Drawing.Size(264, 18);
             this.radLabel2.TabIndex = 0;
             this.radLabel2.Text = "เลขที่ Invoice No , DL No ใหม่";
             // 
             // radLabel1
             // 
+            this.radLabel1.AutoSize = false;
             this.radLabel1.Location = new System.Drawing.Point(68, 27);
             this.radLabel1.Name = "radLabel1";
-            this.radLabel1.Size = new System.Drawing.Size(147, 18);
+            this.radLabel1.Size = new System.Drawing.Size(273, 18);
             this.radLabel1.TabIndex = 0;
             this.radLabel1.Text = "เลือก Invoice No , DL No เดิม";
             // 

@@ -13,7 +13,47 @@ namespace StockControl
     {
         public PathConfig()
         {
+            this.Name = "PathConfig";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Path List";
+                radLabelElement1.Text = "Status: Path List";
+                btnRefresh.Text = "Refresh";
+               
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+               
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Code";
+                radGridView1.Columns[1].HeaderText = "Detail";
+                radGridView1.Columns[2].HeaderText = "Location";
+                //radGridView1.Columns[3].HeaderText = "Fax";
+                //radGridView1.Columns[4].HeaderText = "Email";
+                //radGridView1.Columns[5].HeaderText = "VendorNo.";
+
+
+
+
+            }
         }
 
         //private int RowView = 50;

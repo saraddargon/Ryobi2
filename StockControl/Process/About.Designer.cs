@@ -60,17 +60,17 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(213, 20);
             this.textBox1.TabIndex = 2;
-            this.textBox1.Text = "Parts Management";
+            this.textBox1.Text = "Spare Parts Management";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(44, 67);
+            this.label2.Location = new System.Drawing.Point(12, 64);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(67, 13);
+            this.label2.Size = new System.Drawing.Size(99, 16);
             this.label2.TabIndex = 1;
             this.label2.Text = "ชื่อซอฟต์แวร์";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // textBox2
             // 
@@ -79,17 +79,17 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(213, 20);
             this.textBox2.TabIndex = 4;
-            this.textBox2.Text = "1.0.4";
+            this.textBox2.Text = "1.0.0";
             this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(69, 92);
+            this.label3.Location = new System.Drawing.Point(33, 90);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.Size = new System.Drawing.Size(78, 15);
             this.label3.TabIndex = 3;
             this.label3.Text = "เวอร์ชั่น";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // textBox3
             // 
@@ -103,12 +103,12 @@
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(43, 120);
+            this.label4.Location = new System.Drawing.Point(15, 116);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(68, 13);
+            this.label4.Size = new System.Drawing.Size(96, 17);
             this.label4.TabIndex = 5;
             this.label4.Text = "บริษัทผู้จัดทำ";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // textBox4
             // 
@@ -122,12 +122,12 @@
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(56, 145);
+            this.label5.Location = new System.Drawing.Point(18, 142);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(54, 13);
+            this.label5.Size = new System.Drawing.Size(92, 16);
             this.label5.TabIndex = 7;
             this.label5.Text = "พัฒนาโดย";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // pictureBox1
             // 

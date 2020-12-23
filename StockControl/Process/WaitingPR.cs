@@ -15,14 +15,57 @@ namespace StockControl
     {
         public WaitingPR()
         {
+            this.Name = "WaitingPR";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+
+            CallLang();
         }
 
         //private int RowView = 50;
         //private int ColView = 10;
         DataTable dt = new DataTable();
-    
 
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                btnSave.Text = "Create P/R";
+                btnCal.Text = "Calculate";
+                btnExport.Text = "Export";
+                btnRefresh.Text = "Refresh";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                this.Text = "Waiting Create P/R";
+                radLabelElement1.Text = "Create P/R";
+                radButton1.Text = "Search..";
+                radLabel1.Text = "Select Vendor :";
+                radLabel2.Text = "Vendor No. :";
+
+                dgvData.Columns[0].HeaderText = "Select";
+                dgvData.Columns[1].HeaderText = "No.";
+                dgvData.Columns[2].HeaderText = "CodeNo.";
+                dgvData.Columns[3].HeaderText = "Description";
+                dgvData.Columns[4].HeaderText = "Remain Q'ty";
+                dgvData.Columns[5].HeaderText = "Q'ty (BackOrder)";
+                dgvData.Columns[6].HeaderText = "Order Q'ty";
+                dgvData.Columns[7].HeaderText = "Unit";
+                dgvData.Columns[8].HeaderText = "PCS/Unit";
+                dgvData.Columns[9].HeaderText = "LeadTime";
+                dgvData.Columns[10].HeaderText = "Max Stock";
+                dgvData.Columns[11].HeaderText = "Min Stock";
+
+                dgvData.Columns[12].HeaderText = "Vendor No.";
+                dgvData.Columns[13].HeaderText = "Vendor Name";
+           
+
+            }
+        }
         private void radMenuItem2_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
@@ -57,7 +100,7 @@ namespace StockControl
             GETDTRow();
             DefaultItem();
             
-            DataLoad();
+           // DataLoad();
 
             crow = 0;
         }
@@ -112,69 +155,129 @@ namespace StockControl
                         string Vendorno = "";
                         //if (!cboVendor.Text.Equals(""))
                         Vendorno = txtVendorNo.Text;
-                        
-
-                        var gd = (from a in db.tb_Items
-                                  join b in db.tb_Vendors on a.VendorNo equals b.VendorNo
-                                  where a.Status == "Active" 
-                                  && a.StopOrder == false
-                                  && (a.VendorNo.Contains(Vendorno))
-                                  && (b.VendorName.Contains(cboVendor.Text))
-                                  && (( a.StockInv+a.StockDL+a.StockBackOrder
-                                  
-                                       // (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Invoice", 0)))
-                                                  //+ (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Temp", 0)))
-                                                   //+ (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "BackOrder", 0)))
-                                    ) <= Convert.ToDecimal(a.MinimumStock))
-                                  //&& (Convert.ToDecimal(a.StockInv) + Convert.ToDecimal(a.StockDL)
-                                  //  + Convert.ToDecimal(a.StockBackOrder) <= Convert.ToDecimal(a.MinimumStock))
-                                 
-                                  select new {
-                                      CodeNo = a.CodeNo,
-                                      ItemDescription = a.ItemDescription,
-                                      Order = Convert.ToDecimal(a.MaximumStock),
-
-                                      //StockQty = (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Invoice", 0)))
-                                      //            + (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Temp", 0))) ,
-                                      StockQty = Convert.ToDecimal(a.StockInv) + Convert.ToDecimal(a.StockDL),
-                                      //BackOrder = (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "BackOrder", 0))),
-                                      BackOrder = StockControl.dbClss.TSt(a.StockBackOrder),
 
 
-                                      UnitBuy = a.UnitBuy,
-                                      PCSUnit = StockControl.dbClss.TSt(a.PCSUnit),
-                                      LeadTime = StockControl.dbClss.TSt(a.Leadtime),
-                                      MaxStock = StockControl.dbClss.TSt(a.MaximumStock),
-                                      MinStock = StockControl.dbClss.TSt(a.MinimumStock),
-                                      VendorNo = a.VendorNo,
-                                      VendorName = b.VendorName,
-                                      
-                                  })//.Where(ab => ab.VendorNo.Contains(Vendorno))
-                                  .ToList();
-                        //dgvData.DataSource = gd;
-                        if (gd.Count > 0)
+                        //var gd = (from a in db.tb_Items
+                        //          join b in db.tb_Vendors on a.VendorNo equals b.VendorNo
+                        //          where a.Status == "Active" 
+                        //          && a.StopOrder == false
+                        //          && (a.VendorNo.Contains(Vendorno))
+                        //          && (b.VendorName.Contains(cboVendor.Text))
+                        //          && (( a.StockInv+a.StockDL+a.StockBackOrder
+
+                        //               // (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Invoice", 0)))
+                        //                          //+ (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Temp", 0)))
+                        //                           //+ (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "BackOrder", 0)))
+                        //            ) <= Convert.ToDecimal(a.MinimumStock))
+                        //          //&& (Convert.ToDecimal(a.StockInv) + Convert.ToDecimal(a.StockDL)
+                        //          //  + Convert.ToDecimal(a.StockBackOrder) <= Convert.ToDecimal(a.MinimumStock))
+
+                        //          select new {
+                        //              CodeNo = a.CodeNo,
+                        //              ItemDescription = a.ItemDescription,
+                        //              Order = Convert.ToDecimal(a.MaximumStock),
+
+                        //              //StockQty = (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Invoice", 0)))
+                        //              //            + (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "Temp", 0))) ,
+                        //              StockQty = Convert.ToDecimal(a.StockInv) + Convert.ToDecimal(a.StockDL),
+                        //              //BackOrder = (Convert.ToDecimal(db.Cal_QTY(a.CodeNo, "BackOrder", 0))),
+                        //              BackOrder = StockControl.dbClss.TSt(a.StockBackOrder),
+
+
+                        //              UnitBuy = a.UnitBuy,
+                        //              PCSUnit = StockControl.dbClss.TSt(a.PCSUnit),
+                        //              LeadTime = StockControl.dbClss.TSt(a.Leadtime),
+                        //              MaxStock = StockControl.dbClss.TSt(a.MaximumStock),
+                        //              MinStock = StockControl.dbClss.TSt(a.MinimumStock),
+                        //              VendorNo = a.VendorNo,
+                        //              VendorName = b.VendorName,
+
+                        //          })//.Where(ab => ab.VendorNo.Contains(Vendorno))
+                        //          .ToList();
+                        ////dgvData.DataSource = gd;
+                        //if (gd.Count > 0)
+                        //{
+                        //    foreach(var gg in gd)
+                        //    {
+                        //        dgvData.Rows.Add(false, "", gg.CodeNo,
+                        //                        gg.ItemDescription,
+                        //                        gg.Order,
+                        //                        gg.StockQty,
+                        //                        gg.BackOrder,
+                        //                        gg.UnitBuy,
+                        //                        gg.PCSUnit,
+                        //                        gg.LeadTime,
+                        //                        gg.MaxStock,
+                        //                        gg.MinStock,
+                        //                        gg.VendorNo,
+                        //                        gg.VendorName);
+                        //    }
+                        //}
+
+                        dgvData.DataSource = null;
+                        var VenNo = db.spx_002_getPRListWaiting(Vendorno,dbClss.DeptSC).ToList();
+                        if (VenNo.Count > 0)
                         {
-                            foreach(var gg in gd)
+                            dgvData.DataSource = VenNo;
+
+                            int rowcount = 0;
+                            decimal Order = 0;
+                            decimal Pcsunit = 0;
+                            decimal MaxStock = 0;
+                            decimal MinStock = 0;
+                            decimal OrderPoint = 0;
+                            decimal Stock = 0;
+                            decimal BackOrder = 0;
+                            decimal SumStock = 0;
+                            decimal PlusPack = 0;
+                            decimal SafetyStock = 0;
+                            foreach (var x in dgvData.Rows)
                             {
-                                dgvData.Rows.Add(false, "", gg.CodeNo,
-                                                gg.ItemDescription,
-                                                gg.Order,
-                                                gg.StockQty,
-                                                gg.BackOrder,
-                                                gg.UnitBuy,
-                                                gg.PCSUnit,
-                                                gg.LeadTime,
-                                                gg.MaxStock,
-                                                gg.MinStock,
-                                                gg.VendorNo,
-                                                gg.VendorName);
+                                Order = 0;
+                                PlusPack = 0;
+                                SumStock = 0;
+                                Stock = 0;
+                                BackOrder = 0;
+                                Pcsunit = 0;
+                                MaxStock = 0;
+                                OrderPoint = 0;
+                                decimal.TryParse(x.Cells["PCSUnit"].Value.ToString(), out Pcsunit);
+                                decimal.TryParse(x.Cells["MaximumStock"].Value.ToString(), out MaxStock);
+                                decimal.TryParse(x.Cells["MinimumStock"].Value.ToString(), out MinStock);
+                                decimal.TryParse(x.Cells["ReOrderPoint"].Value.ToString(), out OrderPoint);
+                                decimal.TryParse(x.Cells["StockQty"].Value.ToString(), out Stock);
+                                decimal.TryParse(x.Cells["SafetyStock"].Value.ToString(), out SafetyStock);
+                                decimal.TryParse(x.Cells["BackOrder"].Value.ToString(), out BackOrder);
+
+                                SumStock = Stock + BackOrder;
+                                if (Pcsunit == 0)
+                                    Pcsunit = 1;
+                                if (OrderPoint == 0)
+                                    OrderPoint = 1;
+
+                                Order = (SafetyStock - SumStock);//Pcsunit;
+
+                                if ((Order % Pcsunit) > 0)
+                                {
+                                    Order = Order-(Order % Pcsunit);
+                                    Order = Order + Pcsunit;
+                                }
+
+                                if (Order > MaxStock)
+                                    Order = MaxStock;
+
+                                Order = Math.Round(Order / Pcsunit, 0);
+                                                             
+                                //Order = Order + PlusPack;
+                                if (Order < (OrderPoint / Pcsunit))
+                                    Order = (OrderPoint / Pcsunit);
+
+
+                                rowcount += 1;
+                                x.Cells["dgvNo"].Value = rowcount;
+                                x.Cells["Order"].Value = Order;
+
                             }
-                        }
-                        int rowcount = 0;
-                        foreach (var x in dgvData.Rows)
-                        {
-                            rowcount += 1;
-                            x.Cells["dgvNo"].Value = rowcount;
                         }
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -200,6 +303,7 @@ namespace StockControl
                 {
                     if (CodeNo_temp.Equals(""))
                         CodeNo_temp = StockControl.dbClss.TSt(rowinfo.Cells["VendorNo"].Value);
+
                     CodeNo_temp2 = StockControl.dbClss.TSt(rowinfo.Cells["VendorNo"].Value);
 
                     if (!CodeNo_temp.Equals(CodeNo_temp2))
@@ -209,8 +313,7 @@ namespace StockControl
                     }
                     else
                         ck = false;
-                }
-                
+                }                
                 
             }
                 return ck;
@@ -241,6 +344,7 @@ namespace StockControl
                                 //int.TryParse(Convert.ToString(g.Cells["YYYY"].Value), out yyyy);
                                 //int.TryParse(Convert.ToString(g.Cells["MMM"].Value), out mmm);
                                 //decimal.TryParse(Convert.ToString(g.Cells["WorkDays"].Value), out wk);
+
                                 DateTime? d = null;
                                 DateTime d1 = DateTime.Now;
                                 if (Convert.ToString(g.Cells["dgvCodeTemp"].Value).Equals(""))
@@ -532,6 +636,11 @@ namespace StockControl
             try
             {
                 this.Cursor = Cursors.WaitCursor;
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    db.spx_003_CalculatePR(dbClss.DeptSC);
+                }
+                this.Cursor = Cursors.Default;
                 DataLoad();
                 MessageBox.Show("บันทึกสำเร็จ!");
             }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Data;
 using Telerik.WinControls.UI.Export;
 using Telerik.WinControls.UI;
-using Telerik.WinControls.Data;
 using System.Globalization;
 using System.Threading;
 using System.Reflection;
@@ -19,7 +16,38 @@ namespace StockControl
 {
     class dbClss
     {
-        public string versioin = "ss2";
+        public static string versioin = "Spare Part Management 1.0.2";
+        public static string VersionCheck = "1.0.2";
+        public static string UserID = "";
+        public static string DeptSC = "";
+        public static string Company = "";
+        public static string Language = "THA";
+
+        public static bool PermissionScreen(string ScreenName)
+        {
+            bool ck = false;
+            try
+            {
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    OpenForm op = db.OpenForms.Where(o => o.LinkNode == ScreenName).FirstOrDefault();
+                    if (op != null)
+                    {
+                        tb_UserPermission up = db.tb_UserPermissions.Where(u => u.ScreenName == op.TextNode && u.UserID == dbClss.UserID).FirstOrDefault();
+                        if (up != null)
+                        {
+                            ck = true;
+                        }
+                    }
+                    //TextNode
+                }
+
+            }
+            catch { }
+
+
+            return ck;
+        }
         public static Telerik.WinControls.UI.RadRibbonForm CreateForm(string form)
         {
             try
@@ -30,6 +58,36 @@ namespace StockControl
             }
             // catch (Exception ex) { ErrorAdd("Open CreateForm" + "FMS." + form, ex.ToString(), "BaseClass.cs"); return null; }
             catch (Exception ex) { MessageBox.Show(ex.Message + Environment.NewLine + "ไม่มีไฟล์ link"); return null; }
+
+        }
+        public static void ChangeTextEng(object obj,int Ac,string Screen,string Stext)
+        {
+            if (Ac.Equals(1))
+            {
+                Label tx = (Label)obj;
+                tx.Text = Stext;
+            }
+            if(Ac.Equals(2))
+            {
+                RadButtonElement bn = (RadButtonElement)obj;
+                bn.Text = Stext;
+            }
+            if(Ac.Equals(3))
+            {
+                RadLabel lb = (RadLabel)obj;
+                lb.Text = Stext;
+            }
+
+            if (Ac.Equals(4))
+            {
+                RadGroupBox lb = (RadGroupBox)obj;
+                lb.Text = Stext;
+            }
+            if (Ac.Equals(5))
+            {
+                RadCheckBox lb = (RadCheckBox)obj;
+                lb.Text = Stext;
+            }
 
         }
         // ฟังก์ชั่น Update DatagridView
@@ -52,8 +110,7 @@ namespace StockControl
             sv.ShowDialog();
             if (sv.FileName != "")
             {
-
-
+                               
                 ExportToCSV exporter = new ExportToCSV(rv);
                 exporter.FileExtension = "csv";
                 exporter.ColumnDelimiter = ",";

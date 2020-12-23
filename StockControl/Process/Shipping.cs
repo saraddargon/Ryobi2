@@ -16,14 +16,81 @@ namespace StockControl
     {
         public Shipping()
         {
+            this.Name = "Shipping";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+
         }
         public Shipping(string SHNo,string CodeNo)
         {
+            this.Name = "Shipping";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            
             SHNo_t = SHNo;
             CodeNo_t = CodeNo;
+            CallLang();
         }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                
+                this.Text = "Create Shipping";
+                radLabelElement1.Text = "Shipping";
+                btnNew.Text = "New Data";
+                btnSave.Text = "Save Data";
+                btnRefresh.Text = "Refresh";
+                btnFilter1.Text = "Fitler";
+                btnUnfilter1.Text = "Unfilter";
+                btnPrint.Text = "Print";
+                btnListItem.Text = "List Item";
+                btnDelete.Text = "Delete";
+
+                radLabel4.Text = "Shipping No.";
+                radLabel2.Text = "Req. By";
+                radLabel5.Text = "Shipping Date";
+                radLabel7.Text = "Remark";
+                ลบรายการToolStripMenuItem.Text = "Delete Item.";
+                radLabel8.Text = "CreateBy";
+                radLabel10.Text = "CreateDate";
+                radLabel6.Text = "Total (Qty)";
+
+                dgvData.Columns[0].HeaderText = "No";
+                dgvData.Columns[1].HeaderText = "CodeNo";
+                dgvData.Columns[2].HeaderText = "ToolName";
+                dgvData.Columns[3].HeaderText = "Description";
+                dgvData.Columns[4].HeaderText = "Remain Q'ty";
+                dgvData.Columns[5].HeaderText = "Ship Q'ty";
+                dgvData.Columns[6].HeaderText = "Unit";
+                dgvData.Columns[7].HeaderText = "Shelf No.";
+                dgvData.Columns[8].HeaderText = "ToolLife";
+                dgvData.Columns[9].HeaderText = "Lot No.";
+                dgvData.Columns[10].HeaderText = "Machine";
+                dgvData.Columns[11].HeaderText = "Line No.";
+                dgvData.Columns[12].HeaderText = "Mold";
+                dgvData.Columns[13].HeaderText = "purpose";               
+                dgvData.Columns[14].HeaderText = "Remark Tool";
+                dgvData.Columns[15].HeaderText = "Remark HD";
+                dgvData.Columns[16].HeaderText = "PCS/Unit";
+
+
+
+
+            }
+        }
+
         string SHNo_t = "";
         string CodeNo_t = "";
         string Ac = "";
@@ -80,12 +147,23 @@ namespace StockControl
 
         private void Unit_Load(object sender, EventArgs e)
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             //dgvData.ReadOnly = true;
             dgvData.AutoGenerateColumns = false;
             GETDTRow();
    
             DefaultItem();
-            
+            using (DataClasses1DataContext db = new DataClasses1DataContext())
+            {
+                tb_Control cn = db.tb_Controls.Where(c => c.DocumentName == "SH" && c.Format.Equals(dbClss.DeptSC)).FirstOrDefault();
+                if (cn != null)
+                {
+                    SHnoPK = cn.ControlNo;
+                }
+            }
+            if (SHnoPK == 0)
+                SHnoPK = 5;
             btnNew_Click(null, null);
 
             if (!SHNo_t.Equals(""))
@@ -103,8 +181,39 @@ namespace StockControl
                 txtCodeNo.Text = CodeNo_t;
                 Insert_data();
                 txtCodeNo.Text = "";
+            }else
+            {
+              //  CheckPDAList();
             }
 
+            if(!dbClss.Company.Equals("RYOBI"))
+            {
+                dgvData.Columns["ShelfNo"].IsVisible = false;
+                dgvData.Columns["ToolLife"].IsVisible = false;
+                dgvData.Columns["RemarkTool"].IsVisible = false;
+
+                dgvData.Columns["PCSUnit"].IsVisible = true;
+                dgvData.Columns["LotNo"].IsVisible = true;
+                dgvData.Columns["Remark2"].IsVisible = true;
+
+               // dgvData.Columns["ItemNo"].HeaderText = "ชื่อทูล";
+               // dgvData.Columns["CodeNo"].HeaderText = "รหัสทูล";
+              //  dgvData.Columns["ItemDescription"].HeaderText = "รายละเอียดทูล";
+            }
+            
+
+        }
+
+        private void CheckPDAList()
+        {
+            using (DataClasses1DataContext db = new DataClasses1DataContext())
+            {
+                tb_ShippingPDA pd = db.tb_ShippingPDAs.Where(s => s.Dept == dbClss.DeptSC && s.Status == "Waiting").FirstOrDefault();
+                if(pd!=null)
+                {
+                    MessageBox.Show("มีรายการค้างจาก List Shipping (PDA)!!!");
+                }
+            }
         }
         private void DefaultItem()
         {
@@ -116,22 +225,62 @@ namespace StockControl
                 //cboVendor.DataSource = (from ix in db.tb_Vendors.Where(s => s.Active == true)
                 //                        select new { ix.VendorNo,ix.VendorName,ix.CRRNCY }).ToList();
                 //cboVendor.SelectedIndex = 0;
-
+                
 
                 try
                 {
 
+
                     
+                   // GridViewMultiComboBoxColumn col = (GridViewMultiComboBoxColumn)dgvData.Columns["MCName"];
+                    GridViewComboBoxColumn col = (GridViewComboBoxColumn)dgvData.Columns["MCName"];
+                    col.DataSource = (from ix in db.tb_TypeMachineNames.Where(t => t.TypeT == "Machine"
+                    )
+                                      orderby ix.ValueDetail
+                                      select new {ix.ValueDetail,ix.Remark }).ToList();
+                    //    db.tb_TypeMachineNames.Where(t => t.Dept == dbClss.DeptSC
+                    //&& t.TypeT == "Machine"    
+                    //).ToList();
+                    col.DisplayMember = "ValueDetail";
+                    col.ValueMember = "ValueDetail";
+                    col.DropDownStyle = Telerik.WinControls.RadDropDownStyle.DropDown;
 
-                    //GridViewMultiComboBoxColumn col = (GridViewMultiComboBoxColumn)radGridView1.Columns["CodeNo"];
-                    //col.DataSource = (from ix in db.tb_Items.Where(s => s.Status.Equals("Active")) select new { ix.CodeNo, ix.ItemDescription }).ToList();
-                    //col.DisplayMember = "CodeNo";
-                    //col.ValueMember = "CodeNo";
 
-                    //col.DropDownStyle = Telerik.WinControls.RadDropDownStyle.DropDown;
-                    //col.FilteringMode = GridViewFilteringMode.DisplayMember;
 
-                    // col.AutoSizeMode = BestFitColumnMode.DisplayedDataCells;
+                    GridViewComboBoxColumn col2 = (GridViewComboBoxColumn)dgvData.Columns["LineName"];
+                    col2.DataSource = (from ix in db.tb_TypeMachineNames.Where(t => t.TypeT == "Line"
+                    )
+                                       orderby ix.ValueDetail
+                                       select new { ix.ValueDetail, ix.Remark }).ToList();
+                    //    db.tb_TypeMachineNames.Where(t => t.Dept == dbClss.DeptSC
+                    //&& t.TypeT == "Machine"    
+                    //).ToList();
+                    col2.DisplayMember = "ValueDetail";
+                    col2.ValueMember = "ValueDetail";
+                    col2.DropDownStyle = Telerik.WinControls.RadDropDownStyle.DropDown;
+
+
+                    GridViewComboBoxColumn col3 = (GridViewComboBoxColumn)dgvData.Columns["MOLD"];
+                    col3.DataSource = (from ix in db.tb_TypeMachineNames.Where(t =>t.TypeT == "MOLD"
+                                       
+                    )
+                                       orderby ix.ValueDetail
+                                       select new { ix.ValueDetail, ix.Remark }).ToList();
+                    //    db.tb_TypeMachineNames.Where(t => t.Dept == dbClss.DeptSC
+                    //&& t.TypeT == "Machine"    
+                    //).ToList();
+                    col3.DisplayMember = "ValueDetail";
+                    col3.ValueMember = "ValueDetail";
+                    col3.DropDownStyle = Telerik.WinControls.RadDropDownStyle.DropDown;
+
+
+
+
+
+                    // col.FilteringMode = GridViewFilteringMode.DisplayMember;
+                    //col.AutoSizeMode = BestFitColumnMode.SummaryRowCells;
+                    //  col.AllowResize = false;
+                    //  col.BestFit();
                 }
                 catch { }
 
@@ -149,6 +298,7 @@ namespace StockControl
           
             dt_h.Rows.Clear();
             dt_d.Rows.Clear();
+            dgvData.DataSource = null;
             try
             {
 
@@ -193,7 +343,7 @@ namespace StockControl
                                 lblStatus.Text = "Cancel";
                                 dgvData.ReadOnly = true;
                                 btnNew.Enabled = true;
-                                btnDel_Item.Enabled = false;
+                                //btnDel_Item.Enabled = false;
                             }
                             else if
                                 (StockControl.dbClss.TSt(g.FirstOrDefault().Status).Equals("Process"))
@@ -205,7 +355,7 @@ namespace StockControl
                                 lblStatus.Text = "Process";
                                 dgvData.ReadOnly = false;
                                 btnNew.Enabled = true;
-                                btnDel_Item.Enabled = false;
+                               // btnDel_Item.Enabled = false;
                             }
                             else if
                                 (StockControl.dbClss.TSt(g.FirstOrDefault().Status).Equals("Completed"))
@@ -218,7 +368,7 @@ namespace StockControl
                                 lblStatus.Text = "Completed";
                                 dgvData.ReadOnly = true;
                                 btnNew.Enabled = true;
-                                btnDel_Item.Enabled = false;
+                               // btnDel_Item.Enabled = false;
                             }
                             else
                             {
@@ -229,13 +379,14 @@ namespace StockControl
                                 //btnEdit.Enabled = true;
                                 lblStatus.Text = StockControl.dbClss.TSt(g.FirstOrDefault().Status);
                                 dgvData.ReadOnly = false;
-                                btnDel_Item.Enabled = false;
+                                //btnDel_Item.Enabled = false;
                             }
                             dt_h = StockControl.dbClss.LINQToDataTable(g);
 
                             //Detail
                             var d = (from ix in db.tb_Shippings select ix)
                             .Where(a => a.ShippingNo == txtSHNo.Text.Trim()
+                            && a.Dept == dbClss.DeptSC
                                 && a.Status != "Cancel").ToList();
                             if (d.Count() > 0)
                             {
@@ -250,17 +401,20 @@ namespace StockControl
                                     x.Cells["dgvNo"].Value = c;
 
                                     id = Convert.ToInt32(x.Cells["id"].Value);
+                                    x.Cells["RemainQty"].Value = db.Cal_QTY(x.Cells["CodeNo"].Value.ToString(), "", 0);
+                                    x.Cells["PDAid"].Value = 0;
+                                   // x.Cells["StandardCost"].Value= Convert.ToDecimal(x.Cells["StandardCost"].Value);
 
-                                    var s = (from ix in db.tb_Stocks select ix)
-                                       .Where(a => a.DocNo == txtSHNo.Text.Trim()
-                                           && a.Refid == id).FirstOrDefault();
-                                    if (s != null)
-                                    {
-                                        x.Cells["RemainQty"].Value = Convert.ToDecimal(s.RemainQty);
-                                        x.Cells["StandardCost"].Value = Convert.ToDecimal(s.UnitCost);
-                                        x.Cells["Amount"].Value = Math.Abs(Convert.ToDecimal(s.AmountCost));
-                                    }
-                                   
+                                    //var s = (from ix in db.tb_Stocks select ix)
+                                    //   .Where(a => a.DocNo == txtSHNo.Text.Trim()
+                                    //       && a.Refid == id).FirstOrDefault();
+                                    //if (s != null)
+                                    //{
+                                    //    x.Cells["RemainQty"].Value = db.Cal_QTY(x.Cells["CodeNo"].Value.ToString(), "", 0);
+                                    //    x.Cells["StandardCost"].Value = Convert.ToDecimal(s.UnitCost);
+                                    //    x.Cells["Amount"].Value = Math.Abs(Convert.ToDecimal(s.AmountCost));
+                                    //}
+
                                 }
                             }
                             Cal_Amount();
@@ -319,7 +473,7 @@ namespace StockControl
                 //txtTempNo.Enabled = ss;
                 dtRequire.Enabled = ss;
                 dgvData.ReadOnly = false;
-                btnDel_Item.Enabled = ss;
+              //  btnDel_Item.Enabled = ss;
 
 
             }
@@ -333,7 +487,7 @@ namespace StockControl
                 dtRequire.Enabled = ss;
                 dgvData.ReadOnly = false;
                 txtRemark.Enabled = ss;
-                btnDel_Item.Enabled = ss;
+               // btnDel_Item.Enabled = ss;
             }
 
             else if (Condition.Equals("Edit"))
@@ -346,12 +500,13 @@ namespace StockControl
                 dtRequire.Enabled = ss;
                 dgvData.ReadOnly = false;
                 txtRemark.Enabled = ss;
-                btnDel_Item.Enabled = ss;
+               // btnDel_Item.Enabled = ss;
             }
         }
+        int SHnoPK = 0;
         private void btnNew_Click(object sender, EventArgs e)
         {
-            btnDel_Item.Enabled = true;
+           // btnDel_Item.Enabled = true;
             btnNew.Enabled = false;
             btnSave.Enabled = true;
             ClearData();
@@ -359,8 +514,9 @@ namespace StockControl
             lblStatus.Text = "New";
             Ac = "New";
 
-           // getมาไว้ก่อน แต่ยังไมได้ save
-            txtSHNo.Text = StockControl.dbClss.GetNo(5, 0);
+            // getมาไว้ก่อน แต่ยังไมได้ save
+            
+            txtSHNo.Text = StockControl.dbClss.GetNo(SHnoPK, 0);
         }
 
         private void btnView_Click(object sender, EventArgs e)
@@ -385,11 +541,28 @@ namespace StockControl
         {
             bool re = true;
             string err = "";
+            decimal Qty1 = 0;
+            decimal Qty2 = 0;
+            dgvData.EndEdit();
             try
             {
-                
-                if (txtSHName.Text.Equals(""))
-                    err += "- “ผู้เบิกสินค้า:” เป็นค่าว่าง \n";
+
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    tb_CloseDate ca = db.tb_CloseDates.OrderByDescending(o => o.CloseDate).FirstOrDefault();
+                    if(ca!=null)
+                    {
+                        if(ca.CloseDate>=dtRequire.Value)
+                        {
+                            err += "- เลือกวันที่น้อยกว่า หรือเท่ากับ: " + Convert.ToDateTime(ca.CloseDate).ToString("dd/MMM/yyyy") + " ไม่ได้!! \n"; ;
+                        }
+                    }
+
+                    
+                }
+
+                    if (txtSHName.Text.Equals(""))
+                        err += "- “ผู้เบิกสินค้า:” เป็นค่าว่าง \n";
                 //if (txtVendorNo.Text.Equals(""))
                 //    err += "- “รหัสผู้ขาย:” เป็นค่าว่าง \n";
                 if (dtRequire.Text.Equals(""))
@@ -398,15 +571,16 @@ namespace StockControl
                 if (dgvData.Rows.Count <= 0)
                     err += "- “รายการ:” เป็นค่าว่าง \n";
                 int c = 0;
+
                 foreach (GridViewRowInfo rowInfo in dgvData.Rows)
                 {
                     if (rowInfo.IsVisible)
                     {
-                        if (StockControl.dbClss.TInt(rowInfo.Cells["QTY"].Value) <= (0))
+                        if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) <= (0))
                         {
                             err += "- “จำนวนเบิก:” ต้องมากกว่า 0 \n";
                         }
-                        else  if (StockControl.dbClss.TInt(rowInfo.Cells["QTY"].Value) != (0))
+                        else if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) != (0))
                         {
                             c += 1;
                             //if (StockControl.dbClss.TSt(rowInfo.Cells["PRNo"].Value).Equals(""))
@@ -415,12 +589,83 @@ namespace StockControl
                             //    err += "- “เลขที่อ้างอิงเอกสาร PRNo:” เป็นค่าว่าง \n";
                             if (StockControl.dbClss.TSt(rowInfo.Cells["CodeNo"].Value).Equals(""))
                                 err += "- “รหัสทูล:” เป็นค่าว่าง \n";
-                            if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) > StockControl.dbClss.TDe(rowInfo.Cells["RemainQty"].Value))
-                                err += "- “จำนวนเบิก:” มากกว่าจำนวนคงเหลือ \n";
+                            //if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) > StockControl.dbClss.TDe(rowInfo.Cells["RemainQty"].Value))
+                            //    err += "- “จำนวนเบิก:” มากกว่าจำนวนคงเหลือ \n";
                             if (StockControl.dbClss.TDe(rowInfo.Cells["UnitShip"].Value).Equals(""))
                                 err += "- “หน่วย:” เป็นค่าว่าง \n";
 
                         }
+
+                        if (dbClss.Company.Equals("RYOBI"))
+                        {
+                            /*
+                            if (dbClss.DeptSC.Equals("MM") || dbClss.DeptSC.Equals("QC"))
+                            {
+                                if (Convert.ToString(rowInfo.Cells["MOLD"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Mold:” เป็นค่าว่าง \n";
+                                }
+                                if (!Convert.ToString(rowInfo.Cells["MCName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Machine:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["MCName"].Value = "";
+                                }
+                                if (!Convert.ToString(rowInfo.Cells["LineName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Line:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["LineName"].Value = "";
+                                }
+                            }
+                            else if (dbClss.DeptSC.Equals("PD") || dbClss.DeptSC.Equals("ME") || dbClss.DeptSC.Equals("ED"))
+                            {
+                                if (Convert.ToString(rowInfo.Cells["MCName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Machine:” เป็นค่าว่าง \n";
+                                }
+                                if (!Convert.ToString(rowInfo.Cells["MOLD"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “MOLD:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["MOLD"].Value = "";
+                                }
+                                if (!Convert.ToString(rowInfo.Cells["LineName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Line:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["LineName"].Value = "";
+                                }
+
+                            }
+                            else if (dbClss.DeptSC.Equals("EM"))
+                            {
+                                if (Convert.ToString(rowInfo.Cells["LineName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Line:” เป็นค่าว่าง \n";
+                                }
+
+                                if (!Convert.ToString(rowInfo.Cells["MOLD"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “MOLD:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["MOLD"].Value = "";
+                                }
+                                if (!Convert.ToString(rowInfo.Cells["MCName"].Value).Equals(""))
+                                {
+                                    err += "- " + rowInfo.Cells["CodeNo"].Value + " “Machine:” ห้ามใส่ค่า \n";
+                                    rowInfo.Cells["MCName"].Value = "";
+                                }
+                            }
+                            */
+                            //////////////////////
+                            //if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) > StockControl.dbClss.TDe(rowInfo.Cells["RemainQty"].Value))
+                            //    err += "- “จำนวนเบิก:” มากกว่าจำนวนคงเหลือ \n";
+                        }
+                        //if (dbClss.Company.Equals("OGUSU"))
+                        //{
+                            if (StockControl.dbClss.TDe(rowInfo.Cells["QTY"].Value) > StockControl.dbClss.TDe(rowInfo.Cells["RemainQty"].Value))
+                                err += "- “จำนวนเบิก:” มากกว่าจำนวนคงเหลือ \n";
+                        //}
+
+
+
+
                     }
                 }
 
@@ -521,8 +766,9 @@ namespace StockControl
                     gg.CreateDate = DateTime.Now;
                     gg.ShipName = txtSHName.Text;
                     gg.Remark = txtRemark.Text;
+                    gg.Dept = dbClss.DeptSC;
                    
-                    gg.BarCode = barcode;
+                   // gg.BarCode = barcode;
                     gg.Status = "Completed";
                     db.tb_ShippingHs.InsertOnSubmit(gg);
                     db.SubmitChanges();
@@ -548,7 +794,7 @@ namespace StockControl
                     string SS = "";
                     if (g.IsVisible.Equals(true))
                     {
-                        if (StockControl.dbClss.TInt(g.Cells["QTY"].Value) != (0)) // เอาเฉพาะรายการที่ไม่เป็น 0 
+                        if (StockControl.dbClss.TDe(g.Cells["QTY"].Value) != (0)) // เอาเฉพาะรายการที่ไม่เป็น 0 
                         {
                             if (StockControl.dbClss.TInt(g.Cells["id"].Value) <= 0)  //New ใหม่
                             {
@@ -567,31 +813,61 @@ namespace StockControl
                                 u.UnitShip = StockControl.dbClss.TSt(g.Cells["UnitShip"].Value);                              
                                 u.Remark = StockControl.dbClss.TSt(g.Cells["Remark"].Value);
                                 u.LotNo = StockControl.dbClss.TSt(g.Cells["LotNo"].Value);
-                                u.SerialNo = StockControl.dbClss.TSt(g.Cells["SerialNo"].Value);
-                                u.MachineName = StockControl.dbClss.TSt(g.Cells["MachineName"].Value);
+                                u.SerialNo = "";// StockControl.dbClss.TSt(g.Cells["SerialNo"].Value);
+                                u.MachineName = StockControl.dbClss.TSt(g.Cells["MCName"].Value);
                                 u.LineName = StockControl.dbClss.TSt(g.Cells["LineName"].Value);
+                                u.MOLD = StockControl.dbClss.TSt(g.Cells["MOLD"].Value);
                                 u.Calbit = false;
                                 u.ClearFlag = false;
                                 u.ClearDate = UpdateDate;
                                 u.Seq = Seq;
                                 u.Status = "Completed";
+                                u.ShipType = "SH";
                                 u.UnitCost = UnitCost;
+                                u.Amount = u.QTY * u.UnitCost;
+                                u.Dept = dbClss.DeptSC;
+                                u.ShelfNo = Convert.ToString(g.Cells["ShelfNo"].Value);
+                                u.ToolLife = Convert.ToDecimal(g.Cells["ToolLife"].Value);
+                                u.RemarkTool= StockControl.dbClss.TSt(g.Cells["RemarkTool"].Value);
+                                tb_Item tm = db.tb_Items.Where(i => i.CodeNo == StockControl.dbClss.TSt(g.Cells["CodeNo"].Value)).FirstOrDefault();
+                                if(tm!=null)
+                                {
+                                    u.DeptCode = tm.DeptCode;
+                                    u.AccountCode = "";
+                                }
+                                
                                 db.tb_Shippings.InsertOnSubmit(u);
                                 db.SubmitChanges();
+
+                                try
+                                {
+                                    if (StockControl.dbClss.TInt(g.Cells["PDAid"].Value) > 0)
+                                    {
+                                        tb_ShippingPDA pd = db.tb_ShippingPDAs.Where(p => p.id == StockControl.dbClss.TInt(g.Cells["PDAid"].Value)).FirstOrDefault();
+                                        if (pd != null)
+                                        {
+                                            pd.Status = "Completed";
+                                            db.SubmitChanges();
+                                        }
+                                    }
+                                }
+                                catch { }
                                 
                                 //C += 1;
-                                dbClss.AddHistory(this.Name, "แก้ไขการเบิก", "เพิ่มรายการเบิก [" + u.CodeNo + " จำนวนเบิก :" + u.QTY.ToString() +" "+u.UnitShip+ "]", txtSHNo.Text);
+                                //dbClss.AddHistory(this.Name, "แก้ไขการเบิก", "เพิ่มรายการเบิก [" + u.CodeNo + " จำนวนเบิก :" + u.QTY.ToString() +" "+u.UnitShip+ "]", txtSHNo.Text);
                                 
                             }
                             else
                             {
                                 if (StockControl.dbClss.TInt(g.Cells["id"].Value) > 0)
                                 {
+                                    /*
                                     foreach (DataRow row in dt_d.Rows)
                                     {
                                         var u = (from ix in db.tb_Shippings
                                                  where ix.id == Convert.ToInt32(g.Cells["id"])
                                                      && ix.ShippingNo == txtSHNo.Text
+                                                     && ix.Dept == dbClss.DeptSC
                                                      && ix.CodeNo == StockControl.dbClss.TSt(g.Cells["CodeNo"].Value)
                                                  select ix).First();
                                         
@@ -653,6 +929,7 @@ namespace StockControl
                                         db.SubmitChanges();
                                         
                                     }
+                                    */
                                 }
                             }
 
@@ -668,12 +945,14 @@ namespace StockControl
                 {
                     if (Check_Save())
                         return;
+
+               
                     if (MessageBox.Show("ต้องการบันทึก ?", "บันทึก", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         this.Cursor = Cursors.WaitCursor;
 
                         if (Ac.Equals("New"))
-                            txtSHNo.Text = StockControl.dbClss.GetNo(5, 2);
+                            txtSHNo.Text = StockControl.dbClss.GetNo(SHnoPK, 2);
 
                     if (!txtSHNo.Text.Equals(""))
                     {
@@ -683,7 +962,7 @@ namespace StockControl
                         
                         DataLoad();
                         btnNew.Enabled = true;
-                        btnDel_Item.Enabled = false;
+                     //   btnDel_Item.Enabled = false;
 
                         ////insert Stock1
                         //Insert_Stock();
@@ -699,6 +978,13 @@ namespace StockControl
                     }
                     }
                 }
+           
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            CGMemory.Memory.SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+            CGMemory.Memory.Heap();
+            
+
         }
         
         private decimal get_cost(string Code)
@@ -782,7 +1068,7 @@ namespace StockControl
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
                     DateTime? CalDate = null;
-                    DateTime? AppDate = DateTime.Now;
+                    DateTime? AppDate = dtRequire.Value;
                     int Seq = 0;
                     string Type = "Shipping";
                     string Category = ""; //Temp,Invoice
@@ -803,9 +1089,8 @@ namespace StockControl
                     decimal sum_Remain = 0;
                     decimal sum_Qty = 0;
 
-                    //string CNNo = CNNo = StockControl.dbClss.GetNo(6, 2);
-                    var g = (from ix in db.tb_Shippings
-                                 //join i in db.tb_Items on ix.CodeNo equals i.CodeNo
+                    
+                    var g = (from ix in db.tb_Shippings                                
                              where ix.ShippingNo.Trim() == txtSHNo.Text.Trim() && ix.Status != "Cancel"
 
                              select ix).ToList();
@@ -822,7 +1107,13 @@ namespace StockControl
                             Qty_Remain = (Convert.ToDecimal(db.Cal_QTY(vv.CodeNo, "", 0)));  //sum ทั้งหมด
                             Qty_Inv = (Convert.ToDecimal(db.Cal_QTY(vv.CodeNo, "Invoice", 0))); //sum เฉพาะ Invoice
                             Qty_DL = (Convert.ToDecimal(db.Cal_QTY(vv.CodeNo, "Temp", 0))); // sum เฉพาะ DL
-                            
+
+                            db.spx_010_CustStock(AppDate, "Shipping", Seq, vv.ShippingNo, "", QTY, dbClss.UserID, DateTime.Now, vv.CodeNo
+                                , 3, vv.id, dbClss.DeptSC, vv.DeptCode, Convert.ToDecimal(vv.PCSUnit), vv.LotNo,"");
+
+                            //update Stock เข้า item
+                            db.sp_010_Update_StockItem(Convert.ToString(vv.CodeNo), "");
+                            /*
                             if (QTY <= Qty_Remain)
                             {                               
 
@@ -857,7 +1148,7 @@ namespace StockControl
                                     gg.DocNo = txtSHNo.Text;
                                     gg.RefNo = "";
                                     gg.CodeNo = vv.CodeNo;
-                                    gg.Type = Type;
+                                    gg.Type = "";// Type;
                                     gg.QTY = -Convert.ToDecimal(QTY);
                                     gg.Inbound = 0;
                                     gg.Outbound = -Convert.ToDecimal(QTY);
@@ -876,11 +1167,20 @@ namespace StockControl
                                     gg.RemainAmount = RemainAmount;
                                     gg.Avg = Avg;
 
+                                    gg.Dept = dbClss.DeptSC;
+                                    tb_Item tm = db.tb_Items.Where(i => i.CodeNo == vv.CodeNo).FirstOrDefault();
+                                    if (tm != null)
+                                    {
+
+                                        gg.DeptCode = tm.DeptCode;
+                                        gg.PCSUnit = 1;
+                                    }
+
 
                                     db.tb_Stocks.InsertOnSubmit(gg);
                                     db.SubmitChanges();
 
-                                    dbClss.AddHistory(this.Name, "เบิกสินค้า", " เบิกสินค้าเลขที่ : " + txtSHNo.Text + " เบิก : " + Category + " CodeNo : " + vv.CodeNo + " จำนวน : " + (-QTY).ToString() + " โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtSHNo.Text);
+                                   // dbClss.AddHistory(this.Name, "เบิกสินค้า", " เบิกสินค้าเลขที่ : " + txtSHNo.Text + " เบิก : " + Category + " CodeNo : " + vv.CodeNo + " จำนวน : " + (-QTY).ToString() + " โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtSHNo.Text);
 
                                 }
                                 else
@@ -933,70 +1233,26 @@ namespace StockControl
                                     gg.RemainUnitCost = 0;
                                     gg.RemainAmount = RemainAmount;
                                     gg.Avg = Avg;
+                                    gg.Dept = dbClss.DeptSC;
+                                    tb_Item tm = db.tb_Items.Where(i => i.CodeNo == vv.CodeNo).FirstOrDefault();
+                                    if (tm != null)
+                                    {
+
+                                        gg.DeptCode = tm.DeptCode;
+                                        gg.PCSUnit = 1;
+                                    }
 
                                     db.tb_Stocks.InsertOnSubmit(gg);
                                     db.SubmitChanges();
-                                    dbClss.AddHistory(this.Name, "เบิกสินค้า", " เบิกสินค้าเลขที่ : " + txtSHNo.Text + " เบิก : " + Category + " CodeNo : " + vv.CodeNo + " จำนวน : " + (-QTY).ToString() + " โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtSHNo.Text);
+                                   // dbClss.AddHistory(this.Name, "เบิกสินค้า", " เบิกสินค้าเลขที่ : " + txtSHNo.Text + " เบิก : " + Category + " CodeNo : " + vv.CodeNo + " จำนวน : " + (-QTY).ToString() + " โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtSHNo.Text);
 
-
-                                    //// --Stock ใน Invoice ไม่พอ ต้องเอาที่ Temp มา
-
-                                    //UnitCost = Convert.ToDecimal(vv.UnitCost);
-                                    //if (UnitCost <= 0)
-                                    //    UnitCost = Convert.ToDecimal(dbClss.Get_Stock(vv.CodeNo, "", "", "Avg"));
-                                    
-                                    //Amount = (-QTY_temp) * UnitCost;
-
-                                    ////แบบที่ 1 จะไป sum ใหม่
-                                    //RemainQty = (Convert.ToDecimal(db.Cal_QTY(vv.CodeNo, "", 0)));
-                                    ////แบบที่ 2 จะไปดึงล่าสุดมา
-                                    ////RemainQty = Convert.ToDecimal(dbClss.Get_Stock(vv.CodeNo, "", "", "RemainQty"));
-                                    //sum_Remain = Convert.ToDecimal(dbClss.Get_Stock(vv.CodeNo, "", "", "RemainAmount"))
-                                    //    + Amount;
-                                    //sum_Qty = RemainQty + (-QTY_temp);
-                                    //Avg = UnitCost;//sum_Remain / sum_Qty;
-                                    //RemainAmount = sum_Remain;
-
-                                    //Category = "Invoice";
-                                    //tb_Stock aa = new tb_Stock();
-                                    //aa.AppDate = AppDate;
-                                    //aa.Seq = Seq;
-                                    //aa.App = "Shipping";
-                                    //aa.Appid = Seq;
-                                    //aa.CreateBy = ClassLib.Classlib.User;
-                                    //aa.CreateDate = DateTime.Now;
-                                    //aa.DocNo = txtSHNo.Text;
-                                    //aa.RefNo = "";
-                                    //aa.CodeNo = vv.CodeNo;
-                                    //aa.Type = Type;
-                                    //aa.QTY = -Convert.ToDecimal(QTY_temp);
-                                    //aa.Inbound = 0;
-                                    //aa.Outbound = -Convert.ToDecimal(QTY_temp);
-                                    //aa.Type_i = 3;  //Receive = 1,Cancel Receive 2,Shipping = 3,Cancel Shipping = 4,Adjust stock = 5,ClearTemp = 6
-                                    //aa.Category = Category;
-                                    //aa.Refid = vv.id;
-                                   
-                                    //aa.CalDate = CalDate;
-                                    //aa.Status = "Active";
-                                    //aa.Flag_ClearTemp = 1; //0 คือ invoice,1 คือ Temp , 2 คือ clear temp แล้ว
-                                    //aa.Type_in_out = Type_in_out;
-                                    //aa.AmountCost = Amount;
-                                    //aa.UnitCost = UnitCost;
-                                    //aa.RemainQty = sum_Qty;
-                                    //aa.RemainUnitCost = 0;
-                                    //aa.RemainAmount = RemainAmount;
-                                    //aa.Avg = Avg;
-
-                                    //db.tb_Stocks.InsertOnSubmit(aa);
-                                    //db.SubmitChanges();
-                                    //dbClss.AddHistory(this.Name, "เบิกสินค้า", " เบิกสินค้าเลขที่ : " + txtSHNo.Text + " เบิก : " + Category + " CodeNo : " + vv.CodeNo + " จำนวน : " + (-QTY_temp).ToString() + " โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtSHNo.Text);
 
                                 }
 
                             }
+                            */
 
-                            //update Stock เข้า item
-                            db.sp_010_Update_StockItem(Convert.ToString(vv.CodeNo), "");
+
                         }
                     }
                 }
@@ -1013,13 +1269,13 @@ namespace StockControl
 
                     if (dgvData.Columns["QTY"].Index == e.ColumnIndex)
                     {
-                        decimal QTY = 0; decimal.TryParse(StockControl.dbClss.TSt(e.Row.Cells["QTY"].Value), out QTY);
-                        decimal RemainQty = 0; decimal.TryParse(StockControl.dbClss.TSt(e.Row.Cells["RemainQty"].Value), out RemainQty);
-                        if (QTY > RemainQty)
-                        {
-                            MessageBox.Show("ไม่สามารถรับเกินจำนวนคงเหลือได้");
-                            e.Row.Cells["QTY"].Value = 0;
-                        }
+                        //decimal QTY = 0; decimal.TryParse(StockControl.dbClss.TSt(e.Row.Cells["QTY"].Value), out QTY);
+                        //decimal RemainQty = 0; decimal.TryParse(StockControl.dbClss.TSt(e.Row.Cells["RemainQty"].Value), out RemainQty);
+                        //if (QTY > RemainQty)
+                        //{
+                        //    MessageBox.Show("ไม่สามารถรับเกินจำนวนคงเหลือได้");
+                        //    e.Row.Cells["QTY"].Value = 0;
+                        //}
                     }
 
                     if (dgvData.Columns["QTY"].Index == e.ColumnIndex
@@ -1173,7 +1429,7 @@ namespace StockControl
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             DataLoad();
-            btnDel_Item.Enabled = false;
+           // btnDel_Item.Enabled = false;
             btnSave.Enabled = false;
             btnNew.Enabled = true;
            
@@ -1185,10 +1441,8 @@ namespace StockControl
             {
                 if (e.KeyChar == 13)
                 {
-
                     Insert_data();
                     txtCodeNo.Text = "";
-
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1197,15 +1451,24 @@ namespace StockControl
         {
             bool re = false;
             dgvData.EndEdit();
-            foreach (var g in dgvData.Rows)
+            if (dbClss.Company.Equals("RYOBI"))
             {
-                if(Convert.ToString(g.Cells["CodeNo"].Value).Equals(CodeNo))
+                re = false;
+            }
+            else
+            {
+                foreach (var g in dgvData.Rows)
                 {
-                    re = true;
-                    MessageBox.Show("รหัสพาร์ทซ้ำ");
-                    break;
+
+                    if (Convert.ToString(g.Cells["CodeNo"].Value).Equals(CodeNo))
+                    {
+                        re = true;
+                        MessageBox.Show("รหัสพาร์ทซ้ำ");
+                        break;
+                    }
                 }
             }
+            
 
             return re;
         }
@@ -1215,64 +1478,114 @@ namespace StockControl
             {
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
-                    //int No = 0;
-                    //string CodeNo = "";
-                    //string ItemNo = "";
-                    //string ItemDescription = "";
-                    //decimal QTY = 0;
-                    //decimal RemainQty = 0;
-                    //string UnitShip = "";
-                    //decimal PCSUnit = 0;
-                    //decimal StandardCost = 0;
-                    //decimal Amount = 0;
-                    ////string CRRNCY = "";
-                    //string LotNo = "";
-                    //string SerialNo = "";
-                    //string Remark = "";
-                    //string MachineName = "";
-                    // string Status = "Waiting";
-                    //int id = 0;
+                   
+
                     int dgvNo = 0;
-
-                    var r = (from i in db.tb_Items
-                                 //join s in db.tb_Stocks on i.CodeNo equals s.RefNo
-
-                             where i.Status == "Active" //&& d.verticalID == VerticalID
-                                && i.CodeNo == txtCodeNo.Text
-                             //&& h.VendorNo.Contains(VendorNo_ss)
-                             select new
-                             {
-                                 CodeNo = i.CodeNo,
-                                 ItemNo = i.ItemNo,
-                                 ItemDescription = i.ItemDescription,
-                                 RemainQty = (Convert.ToDecimal(db.Cal_QTY(i.CodeNo, "", 0))),
-                                 UnitShip = i.UnitShip,
-                                 PCSUnit = i.PCSUnit,
-                                 StandardCodt = i.StandardCost,//Convert.ToDecimal(dbClss.Get_Stock(i.CodeNo, "", "", "Avg")),//i.StandardCost
-                                 Amount = 0,
-                                 QTY = 0,
-                                 LotNo = "",
-                                 SerialNo = "",
-                                 MachineName = "",
-                                 LineName ="",
-                                 Remark ="",
-                                 id = 0
-                                 
-                             }
-                    ).ToList();
-                    if (r.Count > 0)
+                    if (chkUseName.Checked)
                     {
-                        dgvNo = dgvData.Rows.Count() + 1;
+                        var r = (from i in db.tb_Items
+                                     //join s in db.tb_Stocks on i.CodeNo equals s.RefNo
 
-                        foreach (var vv in r)
+                                 where i.Status == "Active" //&& d.verticalID == VerticalID
+                                    && i.ItemNo == txtCodeNo.Text
+                                    && i.Dept == dbClss.DeptSC
+                                 //&& h.VendorNo.Contains(VendorNo_ss)
+                                 select new
+                                 {
+                                     CodeNo = i.CodeNo,
+                                     ItemNo = i.ItemNo,
+                                     ItemDescription = i.ItemDescription,
+                                     RemainQty = (Convert.ToDecimal(db.Cal_QTY(i.CodeNo, "", 0))),
+                                     UnitShip = i.UnitShip,
+                                     PCSUnit = 1,// i.PCSUnit,
+                                     StandardCodt = i.StandardCost / i.PCSUnit,// Convert.ToDecimal(db.Cal_CostAVG(i.CodeNo)),  //i.StandardCost,//Convert.ToDecimal(dbClss.Get_Stock(i.CodeNo, "", "", "Avg")),//i.StandardCost
+                                     Amount = 0,
+                                     QTY = 0,
+                                     LotNo = "",
+                                     SerialNo = "",
+                                     MachineName = "",
+                                     LineName = "",
+                                     Remark = "",
+                                     id = 0,
+                                     ToolLife=i.Toollife,
+                                     ShelfNo=i.ShelfNo,
+                                     RemarkTool=i.Remark
+
+
+                                 }
+                       ).ToList();
+                        if (r.Count > 0)
                         {
-                            dgvData.Rows.Add(dgvNo.ToString(),vv.CodeNo, vv.ItemNo, vv.ItemDescription
-                                        , vv.RemainQty, vv.QTY, vv.UnitShip, vv.PCSUnit, vv.StandardCodt, vv.Amount,
-                                        vv.LotNo, vv.SerialNo, vv.MachineName, vv.LineName, vv.Remark, vv.id
-                                        );
-                        }
+                            dgvNo = dgvData.Rows.Count() + 1;
 
+                            foreach (var vv in r)
+                            {
+                                //dgvData.Rows.Add(dgvNo.ToString(), vv.CodeNo, vv.ItemNo, vv.ItemDescription
+                                //            , vv.RemainQty, vv.QTY, vv.UnitShip,vv.ShelfNo, vv.PCSUnit, vv.StandardCodt, vv.Amount,
+                                //            vv.ToolLife,vv.LotNo, vv.SerialNo, vv.MachineName, vv.LineName, vv.Remark, vv.id, 0,"",vv.RemarkTool
+                                //            );
+
+                                dgvData.Rows.Add(dgvNo.ToString(), vv.CodeNo, vv.ItemNo, vv.ItemDescription
+                                           , vv.RemainQty, vv.QTY, vv.UnitShip, vv.ShelfNo,vv.ToolLife, vv.LotNo, vv.MachineName, vv.LineName,vv.SerialNo, vv.Remark,vv.RemarkTool,"",vv.PCSUnit,vv.id,0,0,0
+                                           );
+                            }
+
+                        }
                     }
+                    else
+                    {
+                        var r = (from i in db.tb_Items
+                                     //join s in db.tb_Stocks on i.CodeNo equals s.RefNo
+
+                                 where i.Status == "Active" //&& d.verticalID == VerticalID
+                                    && i.CodeNo == txtCodeNo.Text
+                                    && i.Dept == dbClss.DeptSC
+                                 //&& h.VendorNo.Contains(VendorNo_ss)
+                                 select new
+                                 {
+                                     CodeNo = i.CodeNo,
+                                     ItemNo = i.ItemNo,
+                                     ItemDescription = i.ItemDescription,
+                                     RemainQty = (Convert.ToDecimal(db.Cal_QTY(i.CodeNo, "", 0))),
+                                     UnitShip = i.UnitShip,
+                                     PCSUnit = 1,// i.PCSUnit,
+                                     StandardCodt = i.StandardCost / i.PCSUnit,// Convert.ToDecimal(db.Cal_CostAVG(i.CodeNo)),  //i.StandardCost,//Convert.ToDecimal(dbClss.Get_Stock(i.CodeNo, "", "", "Avg")),//i.StandardCost
+                                     Amount = 0,
+                                     QTY = 0,
+                                     LotNo = "",
+                                     SerialNo = "",
+                                     MachineName = "",
+                                     LineName = "",
+                                     Remark = "",
+                                     id = 0,
+                                     ToolLife = i.Toollife,
+                                     ShelfNo = i.ShelfNo,
+                                     RemarkTool=i.Remark
+
+                                 }
+                        ).ToList();
+
+
+
+                        if (r.Count > 0)
+                        {
+                            dgvNo = dgvData.Rows.Count() + 1;
+
+                            foreach (var vv in r)
+                            {
+                                //dgvData.Rows.Add(dgvNo.ToString(), vv.CodeNo, vv.ItemNo, vv.ItemDescription
+                                //            , vv.RemainQty, vv.QTY, vv.UnitShip, vv.ShelfNo,vv.PCSUnit, vv.StandardCodt, vv.Amount,
+                                //            vv.ToolLife,vv.LotNo, vv.SerialNo, vv.MachineName, vv.LineName, vv.Remark, vv.id, 0,"",vv.RemarkTool
+                                //            );
+                           
+                                dgvData.Rows.Add(dgvNo.ToString(), vv.CodeNo, vv.ItemNo, vv.ItemDescription
+                                           , vv.RemainQty, vv.QTY, vv.UnitShip, vv.ShelfNo, vv.ToolLife, vv.LotNo, vv.MachineName, vv.LineName, vv.SerialNo, vv.Remark, vv.RemarkTool, "", vv.PCSUnit, vv.id, 0, 0, 0
+                                           );
+                            }
+
+                        }
+                    }
+
                     
                     Cal_Amount();
                      
@@ -1362,13 +1675,13 @@ namespace StockControl
 
                     DataLoad();
                     Ac = "View";
-                    btnDel_Item.Enabled = false;
+                   // btnDel_Item.Enabled = false;
                     btnSave.Enabled = false;
                     btnNew.Enabled = true;
                 }
                 else
                 {
-                    btnDel_Item.Enabled = true;
+                   // btnDel_Item.Enabled = true;
                     btnNew_Click(null, null);
                     txtCodeNo.Text = CodeNo;
 
@@ -1407,6 +1720,184 @@ namespace StockControl
 
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void ลบรายการToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (row >= 0)
+            {
+                try
+                {
+                    int id = 0;
+                    int.TryParse(Convert.ToString(dgvData.Rows[row].Cells["id"].Value), out id);
+                    if (id > 0)
+                    {
+                        if (MessageBox.Show("ต้องการลบรายการหรือไม่ ?", "ลบรายการ", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            DeleteItem(id);
+                            MessageBox.Show("Delete Completed.!");
+                            DataLoad();
+                        }
+                    }
+                    else
+                    {
+                        dgvData.Rows.Remove(dgvData.CurrentRow);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private void radButtonElement1_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("ต้องการลบรายการหรือไม่ ?", "ลบรายการ", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                // DeleteItem(id);
+                int id = 0;
+                int CountA = 0;
+                foreach (GridViewRowInfo rd in dgvData.Rows)
+                {
+                    CountA += 1;
+                    id = 0;
+                    int.TryParse(Convert.ToString(rd.Cells["id"].Value), out id);
+                    DeleteItem(id);
+                }
+                if (CountA > 0)
+                {
+                    MessageBox.Show("Delete Completed.!");
+                    DataLoad();
+                }
+            }
+
+        }
+
+        private void DeleteItem(int id)
+        {
+            try
+            {
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    tb_Shipping sd = db.tb_Shippings.Where(s => s.id == id && !s.Status.Equals("Cancel")).FirstOrDefault();
+                    if (sd != null)
+                    {
+                        sd.Status = "Cancel";
+                        var st = db.tb_Stocks.Where(t => t.Refid == id && t.App == "Shipping").ToList();
+                        if (st.Count > 0)
+                        {
+                            // db.spx_009_UpdateDeleteStock(sd.ShippingNo, "Shipping", id);                            
+                            db.spx_0092_UpdateDeleteStock(sd.ShippingNo, "Shipping", id,dbClss.UserID);
+                            db.sp_010_Update_StockItem(sd.CodeNo, "");
+                        }
+                        
+                        db.SubmitChanges();                       
+                        db.sp_017_Cal_StatusShipping(sd.ShippingNo);
+                    }
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void dgvData_UserDeletingRow(object sender, GridViewRowCancelEventArgs e)
+        {
+            e.Cancel = true;
+            //try
+            //{
+            //    if (row >= 0)
+            //    {
+            //        int id = 0;
+            //        int.TryParse(dgvData.Rows[row].Cells["id"].Value.ToString(), out id);
+            //        if (id > 0)
+            //        {
+            //            e.Cancel = true;
+            //        }
+            //    }
+            //}
+            //catch { }
+        }
+
+        private void radButtonElement2_Click(object sender, EventArgs e)
+        {
+            ShippingPDA spd = new ShippingPDA();
+            spd.Show();
+            //if (MessageBox.Show("ต้องการ Import ข้อมูลจาก PDA หรือไม่ ?", "Import Form PDA", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            //{
+                
+                
+            //    int CountA = 0;
+              
+            //    if (CountA > 0)
+            //    {
+            //        MessageBox.Show("Import Completed.!");
+                    
+            //    }
+            //}
+        }
+
+        private void radButtonElement3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radButtonElement3_Click_1(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("ต้องการ Import ข้อมูลจาก PDA หรือไม่ ?", "Import Form PDA", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+               
+                    try
+                    {
+                        using (DataClasses1DataContext db = new DataClasses1DataContext())
+                        {
+                            int Count2 = 0;
+                            var LoadList = db.tb_ShippingPDAs.Where(s => s.Status == "Waiting" && s.Dept == dbClss.DeptSC).ToList();
+                            foreach(var rd in LoadList)
+                            {
+                                Count2 += 1;
+                            tb_Item tm = db.tb_Items.Where(i => i.CodeNo == rd.CodeNo).FirstOrDefault();
+                            if (tm != null)
+                            {
+                                dgvData.Rows.Add(Count2.ToString(), rd.CodeNo, tm.ItemNo, tm.ItemDescription
+                                            , tm.StockInv, rd.Qty, tm.UnitShip,"", 1,0, 0,0,
+                                            "", rd.Machine, rd.LineName, rd.Mold, "From PDA", 0,rd.id,"",""
+                                            );
+                            }
+
+
+                        }
+                        }
+
+                            MessageBox.Show("Load Completed.!");
+                    }
+                    catch { }
+
+                   
+
+               
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ListPartForShip lsf = new ListPartForShip(dgvData);
+            lsf.ShowDialog();
+            Cal_Amount();
+
+        }
+
+        private void btnUpdateDB_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("ต้องการอัพเดต Remark หรือไม่ ?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                using (DataClasses1DataContext db = new DataClasses1DataContext())
+                {
+                    tb_ShippingH sh = db.tb_ShippingHs.Where(s => s.ShippingNo == txtSHNo.Text).FirstOrDefault();
+                    if(sh!=null)
+                    {
+                        sh.Remark = txtRemark.Text;
+                        db.SubmitChanges();
+                    }
+                }
+            }
+
         }
     }
 }

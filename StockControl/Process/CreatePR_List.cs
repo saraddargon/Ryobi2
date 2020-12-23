@@ -13,9 +13,68 @@ namespace StockControl
     {
         public CreatePR_List(string CodeNox)
         {
+            this.Name = "CreatePR_List";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+           // InitializeComponent();
             CodeNo = CodeNox;
             //this.Text = "ประวัติ "+ Screen;
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                radButtonElement1.Text = "New P/R";
+
+                btn_PrintPR.Text = "Print P/R";
+                btnExport.Text = "Export";
+                btnRefresh.Text = "Refresh";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                this.Text = "List P/R";
+                radLabelElement1.Text = "List P/R";
+                btnSearch.Text = "Search..";
+                radLabel37.Text = "Vendor No. :";
+                radLabel2.Text = "P/R No. :";
+                radLabel5.Text = "Select";
+                radLabel1.Text = "Desc.:";
+                radLabel3.Text = "Code No.:";
+                radLabel4.Text = "To";
+
+
+
+                radGridView1.Columns[0].HeaderText = "No.";
+                radGridView1.Columns[1].HeaderText = "Status";
+                radGridView1.Columns[2].HeaderText = "P/R No.";
+                radGridView1.Columns[3].HeaderText = "Vendor Name";
+                radGridView1.Columns[4].HeaderText = "Code No.";
+                radGridView1.Columns[5].HeaderText = "Tool Name";
+                radGridView1.Columns[6].HeaderText = "Description";
+                radGridView1.Columns[7].HeaderText = "Quantity";
+                radGridView1.Columns[8].HeaderText = "Cost";
+                radGridView1.Columns[9].HeaderText = "Amount";
+                radGridView1.Columns[10].HeaderText = "Pcs/Unit";
+                radGridView1.Columns[11].HeaderText = "Unit";
+
+                radGridView1.Columns[12].HeaderText = "Remain Receipt";
+                radGridView1.Columns[13].HeaderText = "Dept. Code";
+
+                radGridView1.Columns[14].HeaderText = "CreateBy";
+                radGridView1.Columns[15].HeaderText = "CreateDate";
+                radGridView1.Columns[16].HeaderText = "Ref.No";
+
+                this.Text = "List P/R";
+                radLabelElement1.Text = "List P/R";
+
+
+
+            }
         }
         Telerik.WinControls.UI.RadTextBox CodeNo_tt = new Telerik.WinControls.UI.RadTextBox();
         int screen = 0;
@@ -24,10 +83,20 @@ namespace StockControl
             InitializeComponent();
             CodeNo_tt = CodeNox;
             screen = 1;
+            CallLang();
         }
         public CreatePR_List()
         {
+            this.Name = "CreatePR_List";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            // InitializeComponent();
+            CallLang();
         }
 
         string CodeNo = "";
@@ -51,8 +120,13 @@ namespace StockControl
         }
         private void Unit_Load(object sender, EventArgs e)
         {
-            dtDateFrom.Value = DateTime.Now;
-            dtDateTo.Value = DateTime.Now;
+            var today = DateTime.Now;
+            var month = new DateTime(today.Year, today.Month, 1);
+            var first = month;
+            var last = month.AddMonths(1).AddDays(-1);
+
+            dtDateFrom.Value = first;
+            dtDateTo.Value = last;
             Set_dt_Print();
             //radGridView1.ReadOnly = true;
             radGridView1.AutoGenerateColumns = false;
@@ -76,16 +150,18 @@ namespace StockControl
                     // Include the *whole* of the day indicated by searchEndDate
                     DateTime exclusiveEnd = dtDateTo.Value.Date.AddDays(1);
 
-                    var g = (from ix in db.tb_PurchaseRequests select ix)
-                        .Where(a => a.VendorNo.Contains(txtVendorNo.Text)
-                        && (a.Status != "Cancel")
-                        && a.TEMPNo.Contains(txtTempNo.Text)
-                        && a.PRNo.Contains(txtPRNo.Text)
-                        && a.VendorName.Contains(txtVendorName.Text)
-                        && (a.CreateDate >= inclusiveStart
-                                && a.CreateDate < exclusiveEnd)
-                         )
-                        .ToList();
+                    //var g = (from ix in db.tb_PurchaseRequests select ix)
+                    //    .Where(a => a.VendorNo.Contains(txtVendorNo.Text)
+                    //    && (a.Status != "Cancel")
+                    //    && a.TEMPNo.Contains(txtTempNo.Text)
+                    //    && a.PRNo.Contains(txtPRNo.Text)
+                    //    && a.Dept == dbClss.DeptSC
+                    //    && a.VendorName.Contains(txtVendorName.Text)
+                    //    && (a.CreateDate >= inclusiveStart
+                    //            && a.CreateDate < exclusiveEnd)
+                    //     )
+                    //    .ToList();
+                    var g = db.spx_004_SelectListPR(dbClss.DeptSC, chkDate.Checked, dtDateFrom.Value, dtDateTo.Value, txtPRNo.Text, txtTempNo.Text, txtVendorNo.Text, txtVendorName.Text).ToList();
                     if (g.Count > 0)
                     {
 

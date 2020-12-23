@@ -15,7 +15,17 @@ namespace StockControl
     {
         public ReceiveList()
         {
+            this.Name = "ReceiveList";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               this.Close();
+            }
+            CallLang();
+
+
         }
         Telerik.WinControls.UI.RadTextBox RCNo_tt = new Telerik.WinControls.UI.RadTextBox();
         Telerik.WinControls.UI.RadTextBox PRNo_tt = new Telerik.WinControls.UI.RadTextBox();
@@ -28,6 +38,60 @@ namespace StockControl
             RCNo_tt = RCNoxxx;
             PRNo_tt = PRNoxxx;
             screen = 1;
+            CallLang();
+        }
+
+        private void CallLang()
+        {
+            if(dbClss.Language.Equals("ENG"))
+            {
+                btnSave.Text = "Open Doc.";
+                btnRefresh.Text = "Refresh";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                btnExport.Text = "Export";
+                btnPrint.Text = "Print";
+
+                radLabel7.Text = "CodeNo:";
+                radLabel8.Text = "Description:";
+                radLabel2.Text = "Status:";
+                radLabel9.Text = "Vendor :";
+                radLabel4.Text = "To";
+                radLabel3.Text = "Select";
+                radLabel5.Text = "Case Status ALL need Select Date";
+                radButton1.Text = "Search..";
+
+                radLabelElement1.Text = "Receive List";
+                this.Text = "Receive List";
+
+
+                dgvData.Columns[0].HeaderText = "No";
+                dgvData.Columns[1].HeaderText = "Status";
+                dgvData.Columns[2].HeaderText = "Inv No.";
+                dgvData.Columns[3].HeaderText = "Inv Date";
+                dgvData.Columns[4].HeaderText = "PR No.";
+                dgvData.Columns[5].HeaderText = "Dept. Code";
+                dgvData.Columns[6].HeaderText = "Code No.";
+                dgvData.Columns[7].HeaderText = "Tool Name";
+                dgvData.Columns[8].HeaderText = "Description";
+                dgvData.Columns[9].HeaderText = "Recipt Q'ty";
+                dgvData.Columns[10].HeaderText = "Cost";
+                dgvData.Columns[11].HeaderText = "Amount";
+                dgvData.Columns[12].HeaderText = "Unit";
+                dgvData.Columns[13].HeaderText = "Pcs/Unit";
+                dgvData.Columns[14].HeaderText = "VendorNo";
+                dgvData.Columns[15].HeaderText = "VendorName";
+                dgvData.Columns[16].HeaderText = "LotNo";
+                dgvData.Columns[17].HeaderText = "Machine";
+                dgvData.Columns[18].HeaderText = "Line No.";
+                dgvData.Columns[19].HeaderText = "Createby";
+                dgvData.Columns[20].HeaderText = "CreateDate";
+                dgvData.Columns[21].HeaderText = "AccountCode";
+                dgvData.Columns[22].HeaderText = "Receipt No.";
+            
+
+
+            }
         }
 
         DataTable dt = new DataTable();
@@ -65,9 +129,14 @@ namespace StockControl
        
         private void Unit_Load(object sender, EventArgs e)
         {
-            dtDate1.Value = DateTime.Now;
-            dtDate2.Value = DateTime.Now;
-            cboStatus.Text = "ทั้งหมด";
+            var today = DateTime.Now;
+            var month = new DateTime(today.Year, today.Month, 1);
+            var first = month;
+            var last = month.AddMonths(1).AddDays(-1);
+
+            dtDate1.Value = first;
+            dtDate2.Value = last;
+           // cboStatus.Text = "ทั้งหมด";
             dgvData.AutoGenerateColumns = false;
             GETDTRow();
             DefaultItem();
@@ -78,6 +147,7 @@ namespace StockControl
         }
         private void DefaultItem()
         {
+            return;
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 cboVendorName.AutoCompleteMode = AutoCompleteMode.Append;
@@ -114,6 +184,7 @@ namespace StockControl
         }
         private void Load_WaitingReceive()  //รอรับเข้า (รอ Receive)
         {
+            return;
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 string VendorNo_ss = "";
@@ -222,6 +293,7 @@ namespace StockControl
         }
         private void Load_PratitalReceive() //รับเข้าบางส่วน
         {
+            return;
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 string VendorNo_ss = "";
@@ -319,6 +391,7 @@ namespace StockControl
         }
         private void Load_CompletedReceive()//รับเข้าแล้ว
         {
+            return;
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 string VendorNo_ss = "";
@@ -438,16 +511,21 @@ namespace StockControl
                     {
                         //if (cboStatus.Text.Equals("รอรับเข้า"))
                         //    Load_WaitingReceive();
-                        if (cboStatus.Text.Equals("รับเข้าบางส่วน"))
-                            Load_PratitalReceive();
-                        else if (cboStatus.Text.Equals("รับเข้าแล้ว"))
-                            Load_CompletedReceive();
-                        else
-                        {
-                            //Load_WaitingReceive();
-                            Load_PratitalReceive();
-                            Load_CompletedReceive();
-                        }
+                        //if (cboStatus.Text.Equals("รับเข้าบางส่วน"))
+                        //    Load_PratitalReceive();
+                        //else if (cboStatus.Text.Equals("รับเข้าแล้ว"))
+                        //    Load_CompletedReceive();
+                        //else
+                        //{
+                        //    //Load_WaitingReceive();
+                        //    Load_PratitalReceive();
+                        //    Load_CompletedReceive();
+                        //}
+                        dgvData.DataSource = null;
+                        var gList = db.spx_006_selectReceive(dbClss.DeptSC.ToUpper(), chkDate.Checked, dtDate1.Value, dtDate2.Value
+                            , txtCodeNo.Text, txtItemDescription.Text, txtInvoice.Text, txtVendor.Text, cboStatus.Text).ToList();
+                        dgvData.DataSource = gList;
+
 
                         int rowcount = 0;
                         foreach (var x in dgvData.Rows)
@@ -751,6 +829,11 @@ namespace StockControl
 
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            DataLoad();
         }
     }
 }

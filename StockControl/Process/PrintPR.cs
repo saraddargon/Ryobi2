@@ -247,19 +247,28 @@ namespace StockControl
                 {
                     if (Type.Equals("PR"))
                     {
-                       
-                        var g = (from ix in db.sp_R005_ReportPR(PRNo1, PRNo2, DateTime.Now) select ix).ToList();
-                        if (g.Count() > 0)
+
+                        //var g = (from ix in db.sp_R005_ReportPR(PRNo1, PRNo2, DateTime.Now) select ix).ToList();
+                        //if (g.Count() > 0)
+                        //{
+                        string PR = "";
+                        Report.Reportx1.Value = new string[2];
+                        Report.Reportx1.Value[0] = PRNo1;
+                        Report.Reportx1.Value[1] = PRNo2;
+                        Report.Reportx1.WReport = "ReportPR3";
+                        if (dbClss.Company.Equals("OGUSU"))
                         {
-                            Report.Reportx1.Value = new string[2];
-                            Report.Reportx1.Value[0] = PRNo1;
-                            Report.Reportx1.Value[1] = PRNo2;
-                            Report.Reportx1.WReport = "ReportPR3";
-                            Report.Reportx1 op = new Report.Reportx1("ReportPR3.rpt");
-                            op.Show();
+                            PR = "ReportPR2.rpt";
                         }
-                        else
-                            MessageBox.Show("not found.");
+                        else if (dbClss.Company.Equals("RYOBI"))
+                        {
+                            PR = "ReportPR_Ryobi.rpt";
+                        }
+                        Report.Reportx1 op = new Report.Reportx1(PR); //Ryobi                                                                                  
+                        op.Show();
+                        //}
+                        //else
+                        //    MessageBox.Show("not found.");
                     }
                     else if (Type.Equals("Receive"))
                     {

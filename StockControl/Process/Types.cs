@@ -15,7 +15,44 @@ namespace StockControl
     {
         public Types()
         {
+            this.Name = "Types";
+            //  MessageBox.Show(this.Name);
             InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+        }
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+                this.Text = "Type List";
+                radLabelElement1.Text = "Status: Type";
+                btnRefresh.Text = "Refresh";
+                btnNew.Text = "New +";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit Data";
+                btnDelete.Text = "Delete";
+                btnExport.Text = "Export";
+                btnImport.Text = "Import";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "Unfilter";
+
+                // radButtonElement1.Text = "Contact";
+
+                radGridView1.Columns[0].HeaderText = "Group Code.";
+                radGridView1.Columns[1].HeaderText = "Type No.";
+                radGridView1.Columns[2].HeaderText = "Description";
+                radGridView1.Columns[3].HeaderText = "Status";
+
+
+
+
+            }
         }
 
         //private int RowView = 50;

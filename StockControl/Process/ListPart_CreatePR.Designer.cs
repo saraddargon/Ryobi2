@@ -121,15 +121,15 @@
             // 
             // 
             this.radRibbonBar1.RootElement.AutoSizeMode = Telerik.WinControls.RadAutoSizeMode.WrapAroundChildren;
-            this.radRibbonBar1.Size = new System.Drawing.Size(1032, 161);
+            this.radRibbonBar1.Size = new System.Drawing.Size(1032, 160);
             this.radRibbonBar1.StartButtonImage = ((System.Drawing.Image)(resources.GetObject("radRibbonBar1.StartButtonImage")));
             this.radRibbonBar1.StartMenuItems.AddRange(new Telerik.WinControls.RadItem[] {
             this.radMenuItem1});
             this.radRibbonBar1.TabIndex = 0;
-            this.radRibbonBar1.Text = "ListPart (รายการ Item ทั้งหมด)";
+            this.radRibbonBar1.Text = "List Crete (P/R) (รายการ Item ทั้งหมด)";
             this.radRibbonBar1.ThemeName = "Office2010Blue";
             this.radRibbonBar1.Click += new System.EventHandler(this.radRibbonBar1_Click);
-            ((Telerik.WinControls.UI.RadRibbonBarElement)(this.radRibbonBar1.GetChildAt(0))).Text = "ListPart (รายการ Item ทั้งหมด)";
+            ((Telerik.WinControls.UI.RadRibbonBarElement)(this.radRibbonBar1.GetChildAt(0))).Text = "List Crete (P/R) (รายการ Item ทั้งหมด)";
             ((Telerik.WinControls.UI.RadToggleButtonElement)(this.radRibbonBar1.GetChildAt(0).GetChildAt(6).GetChildAt(0))).AutoSizeMode = Telerik.WinControls.RadAutoSizeMode.Auto;
             // 
             // ribbonTab1
@@ -141,6 +141,7 @@
             this.radRibbonBarGroup5});
             this.ribbonTab1.Name = "ribbonTab1";
             this.ribbonTab1.Text = "Action";
+            this.ribbonTab1.UseMnemonic = false;
             // 
             // radRibbonBarGroup1
             // 
@@ -238,7 +239,6 @@
             this.radStatusStrip1.Size = new System.Drawing.Size(1032, 26);
             this.radStatusStrip1.SizingGrip = false;
             this.radStatusStrip1.TabIndex = 1;
-            this.radStatusStrip1.Text = "radStatusStrip1";
             // 
             // radLabelElement1
             // 
@@ -254,9 +254,9 @@
             this.panel1.Controls.Add(this.radGridView1);
             this.panel1.Controls.Add(this.radPanel1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 161);
+            this.panel1.Location = new System.Drawing.Point(0, 160);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1032, 576);
+            this.panel1.Size = new System.Drawing.Size(1032, 577);
             this.panel1.TabIndex = 2;
             // 
             // radGridView1
@@ -300,7 +300,7 @@
             gridViewTextBoxColumn2.Name = "CodeNo";
             gridViewTextBoxColumn2.ReadOnly = true;
             gridViewTextBoxColumn2.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
-            gridViewTextBoxColumn2.Width = 55;
+            gridViewTextBoxColumn2.Width = 110;
             gridViewTextBoxColumn3.EnableExpressionEditor = false;
             gridViewTextBoxColumn3.FieldName = "ItemNo";
             gridViewTextBoxColumn3.HeaderText = "ชื่อพาร์ท";
@@ -312,7 +312,7 @@
             gridViewTextBoxColumn4.HeaderText = "รายละเอียดพาร์ท";
             gridViewTextBoxColumn4.Name = "ItemDescription";
             gridViewTextBoxColumn4.ReadOnly = true;
-            gridViewTextBoxColumn4.Width = 150;
+            gridViewTextBoxColumn4.Width = 200;
             gridViewTextBoxColumn5.EnableExpressionEditor = false;
             gridViewTextBoxColumn5.FieldName = "ShelfNo";
             gridViewTextBoxColumn5.HeaderText = "ชั้นเก็บ";
@@ -398,6 +398,7 @@
             gridViewTextBoxColumn16.FieldName = "SD";
             gridViewTextBoxColumn16.FormatString = "{0:N2}";
             gridViewTextBoxColumn16.HeaderText = "ค่าเบี่ยงเบน";
+            gridViewTextBoxColumn16.IsVisible = false;
             gridViewTextBoxColumn16.Name = "SD";
             gridViewTextBoxColumn16.ReadOnly = true;
             gridViewTextBoxColumn16.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
@@ -440,9 +441,8 @@
             this.radGridView1.Name = "radGridView1";
             this.radGridView1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.radGridView1.ShowGroupPanel = false;
-            this.radGridView1.Size = new System.Drawing.Size(1032, 510);
+            this.radGridView1.Size = new System.Drawing.Size(1032, 511);
             this.radGridView1.TabIndex = 2;
-            this.radGridView1.Text = "Grid";
             this.radGridView1.ThemeName = "Office2010Blue";
             // 
             // radPanel1
@@ -496,11 +496,10 @@
             // 
             // txtVenderNo
             // 
-            this.txtVenderNo.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtVenderNo.BackColor = System.Drawing.Color.White;
             this.txtVenderNo.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtVenderNo.Location = new System.Drawing.Point(304, 36);
             this.txtVenderNo.Name = "txtVenderNo";
-            this.txtVenderNo.ReadOnly = true;
             this.txtVenderNo.Size = new System.Drawing.Size(133, 19);
             this.txtVenderNo.TabIndex = 5;
             this.txtVenderNo.ThemeName = "Office2010Blue";

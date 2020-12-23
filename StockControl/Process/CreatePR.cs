@@ -16,17 +16,106 @@ namespace StockControl
     {
         public CreatePR()
         {
-            InitializeComponent();
+            this.Name = "CreatePR";
+            //  MessageBox.Show(this.Name);
+InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+            CallLang();
+
         }
         public CreatePR(string TempNo)
         {
-            InitializeComponent();
+         
+this.Name = "CreatePR";
+
+InitializeComponent();
+            if (!dbClss.PermissionScreen(this.Name))
+            {
+                MessageBox.Show("Access denied", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
             TempNo_temp = TempNo;
+            CallLang();
         }
         public CreatePR(List<GridViewRowInfo> RetDT)
         {
             InitializeComponent();
             this.RetDT = RetDT;
+            CallLang();
+        }
+
+        private void CallLang()
+        {
+            if (dbClss.Language.Equals("ENG"))
+            {
+              
+                this.Text = "Create P/R";
+                radLabelElement1.Text = "Create P/R";
+
+                btnAdd_Item.Text = "Add Item";
+                btnDel_Item.Text = "Delete Item";
+                radLabel9.Text = "Case for Receive need to Use P/R No.";
+                radGroupBox1.Text = "Status";
+
+                radButtonElement4.Text = "Close P/R";
+                btnPrint.Text = "Print P/R";
+                btnListItem.Text = "List Item";
+                btnRefresh.Text = "Refresh";
+                btnFilter1.Text = "Filter";
+                btnUnfilter1.Text = "UnFilter";
+                btnNew.Text = "New P/R";
+                btnSave.Text = "Save Data";
+                btnView.Text = "Display List";
+                btnEdit.Text = "Edit P/R";
+                btnDelete.Text = "Delete";
+                
+               
+             
+              
+                radLabel14.Text = "Dept.: ";
+                radLabel6.Text = "Remark :";
+                radLabel4.Text = "P/R No.:";
+                radLabel3.Text = "Ref No.:";
+                radLabel5.Text = "Req. Date:";
+                radLabel10.Text = "Address :";
+                radLabel12.Text = "Vendor No. :";
+                radLabel2.Text = "Vendor :";
+                radLabel11.Text = "CRRN :";
+                radLabel1.Text = "Fax. :";
+                radLabel7.Text = "Contact :";
+                radLabel8.Text = "Tel :";
+                radLabel13.Text = "Email :";
+
+
+                dgvData.Columns[0].HeaderText = "No.";
+                dgvData.Columns[1].HeaderText = "CodeNo.";
+                dgvData.Columns[2].HeaderText = "ToolName";
+                dgvData.Columns[3].HeaderText = "Description";
+                dgvData.Columns[4].HeaderText = "Group Type";
+                dgvData.Columns[5].HeaderText = "Quantity";
+                dgvData.Columns[6].HeaderText = "Pcs/Unit";
+                dgvData.Columns[7].HeaderText = "Unit";
+                dgvData.Columns[8].HeaderText = "Cost";
+                dgvData.Columns[9].HeaderText = "Amount";
+                dgvData.Columns[10].HeaderText = "purpose";
+                dgvData.Columns[11].HeaderText = "LotNo";
+
+                dgvData.Columns[12].HeaderText = "Machine";
+                dgvData.Columns[13].HeaderText = "Line";
+
+                dgvData.Columns[14].HeaderText = "Ship Date";
+                //dgvData.Columns[15].HeaderText = "CreateDate";
+                //dgvData.Columns[16].HeaderText = "Ref.No";
+
+
+
+
+
+            }
         }
         //private int RowView = 50;
         //private int ColView = 10;
@@ -178,9 +267,10 @@ namespace StockControl
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
                     var g = (from ix in db.tb_PurchaseRequests select ix)
-                        .Where(a => a.TEMPNo == txtTempNo.Text.Trim()
+                        .Where(a => a.TEMPNo == txtTempNo.Text.Trim() && a.Dept == dbClss.DeptSC
                          && (a.Status != "Cancel")
                          ).ToList();
+
                     if (g.Count() > 0)
                     {
 
@@ -196,6 +286,7 @@ namespace StockControl
                         txtEmail.Text = StockControl.dbClss.TSt(g.FirstOrDefault().Email);
                         txtAddress.Text = StockControl.dbClss.TSt(g.FirstOrDefault().Address);
                         txtRemarkHD.Text = StockControl.dbClss.TSt(g.FirstOrDefault().HDRemark);
+                        txtFromSection.Text = g.FirstOrDefault().FromSection.ToString();
                         if (!StockControl.dbClss.TSt(g.FirstOrDefault().RequireDate).Equals(""))
                             dtRequire.Value = Convert.ToDateTime(g.FirstOrDefault().RequireDate);
                         else
@@ -207,7 +298,7 @@ namespace StockControl
 
                         //Detail
                         var d = (from ix in db.tb_PurchaseRequestLines select ix)
-                            .Where(a => a.TempNo == txtTempNo.Text.Trim() && a.SS == 1 ).ToList();
+                            .Where(a => a.TempNo == txtTempNo.Text.Trim() && a.SS >0 ).ToList();
                         if (d.Count() > 0)
                         {
                             int c = 0;
@@ -301,7 +392,8 @@ namespace StockControl
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 var g = (from ix in db.tb_PurchaseRequests
-                         where ix.TEMPNo.Trim() == txtTempNo.Text.Trim() && ix.Status != "Cancel" 
+                         where ix.TEMPNo.Trim() == txtTempNo.Text.Trim() && ix.Status != "Cancel"
+                         && ix.Dept == dbClss.DeptSC
                          //&& ix.TEMPNo.Trim() == txtTempNo.Text.Trim()
                          select ix).ToList();
                 if (g.Count > 0)  //มีรายการในระบบ
@@ -318,6 +410,7 @@ namespace StockControl
                         //gg.TEMPNo = txtTempNo.Text;
                         gg.UpdateBy = ClassLib.Classlib.User;
                         gg.UpdateDate = DateTime.Now;
+                        gg.FromSection = txtFromSection.Text;
                         dbClss.AddHistory(this.Name,"แก้ไข CreatePR", "แก้ไข CreatePR โดย [" + ClassLib.Classlib.User + " วันที่ :" + DateTime.Now.ToString("dd/MMM/yyyy") + "]", txtPRNo.Text);
 
                         if (!txtPRNo.Text.Trim().Equals(row["PRNo"].ToString()))
@@ -401,6 +494,7 @@ namespace StockControl
                 }
                 else  // Add ใหม่
                 {
+                    txtPRNo.Text = dbClss.GetNo(PRNoPK, 2);
                     byte[] barcode = null;
                     if(!txtPRNo.Text.Equals(""))
                         barcode = StockControl.dbClss.SaveQRCode2D(txtPRNo.Text.Trim());
@@ -418,9 +512,12 @@ namespace StockControl
                     gg.Fax = txtFax.Text.Trim();
                     gg.ContactName = txtContactName.Text.Trim();
                     gg.Email = txtEmail.Text.Trim();
-                    gg.Barcode = barcode;
+                    gg.FromSection = txtFromSection.Text;
+                   // gg.Barcode = barcode;
                     gg.PRNo = txtPRNo.Text;
                     gg.TEMPNo = txtTempNo.Text;
+                    gg.Dept = dbClss.DeptSC;
+                    
 
                     DateTime? RequireDate = DateTime.Now;
                     if (!dtRequire.Text.Equals(""))
@@ -477,11 +574,18 @@ namespace StockControl
                                 u.SerialNo = StockControl.dbClss.TSt(g.Cells["dgvSerialNo"].Value);
                                 u.MCName = StockControl.dbClss.TSt(g.Cells["dgvMCName"].Value);
                                 u.LineName = StockControl.dbClss.TSt(g.Cells["dgvLineName"].Value);
+                                u.Dept = dbClss.DeptSC;
+                            tb_Item im = db.tb_Items.Where(i => i.CodeNo == StockControl.dbClss.TSt(g.Cells["dgvCodeNo"].Value)).FirstOrDefault();
+                            if (im != null)
+                            {
+                                u.DeptAccount = im.DeptCode;
+                            }
 
                                 if (!StockControl.dbClss.TSt(g.Cells["dgvDeliveryDate"].Value).Equals(""))
                                     DeliveryDate = Convert.ToDateTime((g.Cells["dgvDeliveryDate"].Value));
                                 else
                                     DeliveryDate = d;
+
                                 u.DeliveryDate = DeliveryDate;
                                 u.RemainQty = u.OrderQty;//StockControl.dbClss.TDe(g.Cells["dgvRemainQty"].Value);
                                 u.SS = 1;
@@ -675,10 +779,25 @@ namespace StockControl
                 txtAddress.Enabled = ss;
             }
         }
-       
+
+        int PRNoPK = 0;
         private void ClearData()
         {
-            txtPRNo.Text = "";
+            
+            using (DataClasses1DataContext db = new DataClasses1DataContext())
+            {
+                tb_Control cn = db.tb_Controls.Where(c => c.DocumentName == "CreatePR" && c.Format.Equals(dbClss.DeptSC)).FirstOrDefault();
+                if(cn!=null)
+                {
+                    PRNoPK = cn.ControlNo;
+                }
+            }
+            if(PRNoPK==0)
+            {
+                PRNoPK = 10;
+            }
+
+                txtPRNo.Text = dbClss.GetNo(PRNoPK, 0);
             cboVendorName.Text = "";
             txtTempNo.Text = "";
             txtTel.Text = "";
@@ -755,6 +874,7 @@ namespace StockControl
                     {
                         var g = (from ix in db.tb_PurchaseRequests
                                  where ix.TEMPNo.Trim() == txtTempNo.Text.Trim() && ix.Status != "Cancel"
+                                 && ix.Dept==dbClss.DeptSC
                                  //&& ix.TEMPNo.Trim() == txtTempNo.Text.Trim()
                                  select ix).ToList();
                         if (g.Count > 0)  //มีรายการในระบบ
@@ -779,7 +899,7 @@ namespace StockControl
                                         ss.SS = 0;
                                         db.SubmitChanges();
 
-                                        db.sp_010_Update_StockItem(Convert.ToString(ss.CodeNo), "");
+                                        db.sp_010_Update_StockItem(Convert.ToString(ss.CodeNo), "BackOrder");
                                     }
 
                                 }
@@ -898,6 +1018,7 @@ namespace StockControl
 
                                         var p = (from ix in db.tb_PurchaseRequests
                                                  where ix.PRNo.ToUpper().Trim() == txtPRNo.Text.Trim() && ix.Status != "Cancel"
+                                                 && ix.Dept==dbClss.DeptSC
                                                                                                        //&& ix.TEMPNo.Trim() == txtTempNo.Text.Trim()
                                                  select ix).ToList();
                                         if (p.Count > 0)  //มีรายการในระบบ
@@ -968,7 +1089,7 @@ namespace StockControl
                         //insert Stock
                         foreach (var vv in g)
                         {
-                            db.sp_010_Update_StockItem(Convert.ToString(vv.CodeNo),"");
+                            db.sp_010_Update_StockItem(Convert.ToString(vv.CodeNo), "BackOrder");
                             //dbClss.Insert_StockTemp(vv.CodeNo, Convert.ToDecimal(vv.OrderQty), "PR_Temp", "Inv");
                         }
                     }
@@ -1144,9 +1265,27 @@ namespace StockControl
             using (DataClasses1DataContext db = new DataClasses1DataContext())
             {
                 int Row = 0; Row = dgvData.Rows.Count()+1;
-                var g = (from ix in db.tb_Items select ix).Where(a => a.CodeNo.Contains(CodeNo)).ToList();
+                var g = (from ix in db.tb_Items select ix).Where(a => a.CodeNo.Equals(CodeNo)).ToList();
                 if (g.Count > 0)
                 {
+                    //dgvData.Rows.Add(Row.ToString(), CodeNo,
+                    //    StockControl.dbClss.TSt(g.FirstOrDefault().ItemNo)
+                    //    , StockControl.dbClss.TSt(g.FirstOrDefault().ItemDescription)
+                    //    , StockControl.dbClss.TSt(g.FirstOrDefault().GroupCode)
+                    //    , OrderQty
+                    //    , StockControl.dbClss.TDe(g.FirstOrDefault().PCSUnit)
+                    //    , StockControl.dbClss.TSt(g.FirstOrDefault().UnitBuy)
+                    //    , StockControl.dbClss.TDe(g.FirstOrDefault().StandardCost)
+                    //    , 1 * StockControl.dbClss.TDe(g.FirstOrDefault().StandardCost)
+                    //    , ""
+                    //    , "" //Lotno
+                    //    , "" //SerialNo
+                    //    , "" //MCName
+                    //    , "" //LineName
+                    //    , DateTime.Now
+                    //    ,0.0 // RemainQty
+                    //    ,0
+                    //    );
                     dgvData.Rows.Add(Row.ToString(), CodeNo,
                         StockControl.dbClss.TSt(g.FirstOrDefault().ItemNo)
                         , StockControl.dbClss.TSt(g.FirstOrDefault().ItemDescription)
@@ -1159,11 +1298,11 @@ namespace StockControl
                         , ""
                         , "" //Lotno
                         , "" //SerialNo
-                        , "" //MCName
-                        , "" //LineName
+                        , "" //MCName                   
                         , DateTime.Now
-                        ,0.0 // RemainQty
-                        ,0
+                        , 0.0 // RemainQty
+                        , 0
+                        ,""
                         );
                 }
             }
@@ -1315,7 +1454,7 @@ namespace StockControl
                 using (DataClasses1DataContext db = new DataClasses1DataContext())
                 {
                     var g = (from ix in db.tb_PurchaseRequests select ix)
-                        .Where(a => a.PRNo == txtPRNo.Text.Trim()
+                        .Where(a => a.PRNo == txtPRNo.Text.Trim() && a.Dept==dbClss.DeptSC
                         && (a.Status != "Cancel")
                         ).ToList();
                     if (g.Count() > 0)
@@ -1418,9 +1557,13 @@ namespace StockControl
         {
             string RefPO = "";
             string TempNo = txtTempNo.Text;
+            string TX = "ใส่เลขที่ P/O ใหม่!";
+            if (dbClss.Language.Equals("ENG"))
+                TX = "Insert P/O No. New!";
             if (!txtTempNo.Text.Equals(""))
             {
-                string GetMarkup = Interaction.InputBox("ใส่เลขที่ P/O ใหม่!", "P/O New : ", "", 400, 250);
+                string GetMarkup = Interaction.InputBox(TX, "P/O New : ", "", 400, 250);
+                
                 if (!GetMarkup.Trim().Equals(""))
                 {
                     RefPO = GetMarkup;
@@ -1432,6 +1575,36 @@ namespace StockControl
                     btnRefresh_Click(sender, e);
                 }
             }
+
+        }
+
+        private void radButtonElement4_Click(object sender, EventArgs e)
+        {
+            if (!txtTempNo.Text.Equals("") && !txtPRNo.Text.Equals(""))
+            {
+                if (MessageBox.Show("ต้องการปิดเอกสาร ( " + txtPRNo.Text + " ) หรือไม่ ?", "ปิดรายการ", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    try
+                    {
+
+                        using (DataClasses1DataContext db = new DataClasses1DataContext())
+                        {
+                            db.spx_005_UpdatePOPR(txtTempNo.Text, txtPRNo.Text);
+                            foreach (var rd in dgvData.Rows)
+                            {
+                                db.sp_010_Update_StockItem(Convert.ToString(rd.Cells["dgvCodeNo"].Value.ToString()), "BackOrder");
+                            }
+                        }
+                    }
+                    catch { }
+                    MessageBox.Show("Update Completed.");
+                    DataLoad();
+                }
+            }
+        }
+
+        private void dgvData_Click(object sender, EventArgs e)
+        {
 
         }
     }
