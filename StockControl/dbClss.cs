@@ -22,7 +22,7 @@ namespace StockControl
         public static string DeptSC = "";
         public static string Company = "";
         public static string Language = "THA";
-
+        //xth//
         public static bool PermissionScreen(string ScreenName)
         {
             bool ck = false;
